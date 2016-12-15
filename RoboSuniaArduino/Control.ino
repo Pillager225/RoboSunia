@@ -1,5 +1,7 @@
 int dirPins[] = {7, 8};
 int pwmPins[] = {10, 11};
+char curDirs[] = {0, 0};
+char curPWMs[] = {0, 0};
 
 void setupControlPins() {
   for(int i = 0; i < 2; i++) {
@@ -11,8 +13,12 @@ void setupControlPins() {
 // dirs should have two indicies
 // dirs[i] should correspond to dirPins[i]
 void setDirections(char *dirs) {
-  digitalWrite(dirPins[0], dirs[0]);
-  digitalWrite(dirPins[1], dirs[1]);
+  for(int i = 0; i < 2; i++) {
+    if(dirs[i] != curDirs[i]) {
+      curDirs[i] = dirs[i];
+      digitalWrite(dirPins[i], dirs[i]);
+    }
+  }
 }
 
 // pwms should have two indcies
@@ -21,6 +27,10 @@ void setDirections(char *dirs) {
 // valuse from 0-255 and there is no reason to waste extra memory
 // by using ints
 void setPWMs(char *pwms) {
-  analogWrite(pwmPins[0], pwms[0]);
-  analogWrite(pwmPins[1], pwms[1]);
+  for(int i = 0; i < 2; i++) {
+    if(pwms[i] != curPWMs[i]) {
+      curPWMs[i] = pwms[i];
+      analogWrite(pwmPins[i], pwms[i]);
+    }
+  }
 }
