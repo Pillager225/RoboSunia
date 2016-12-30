@@ -61,18 +61,18 @@ class RoboSunia:
 		print("Wifi server started")
 
 	def __init__(self):
-		self.serialConnection = getSerialConnection()
+		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
-			serverSetup()
-			waitForConnection()
+			self.serverSetup()
+			self.waitForConnection()
 			while self.go:
 				# 4 because there are only 4 bytes in a command packet
 				# data[0:2] are the dirs
 				# data[2:4] are the pwms
 				data = self.clientsocket.recv(self.commandPacketLength)	
 				if len(data) == 0:
-					resetClient()
-					waitForConnection()
+					self.resetClient()
+					self.waitForConnection()
 				elif len(data) == self.commandPacketLength:
 					if data == 'quit':
 						self.go = False
@@ -80,7 +80,7 @@ class RoboSunia:
 						for i in range(len(data)):
 							print(int(data[i]))
 						self.serialConnection.write(data)
-			exitGracefully()
+			self.exitGracefully()
 		else:
 			print("Companion Arduino could not be found. Try rebooting.")
 
