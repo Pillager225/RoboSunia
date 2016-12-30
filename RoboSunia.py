@@ -1,7 +1,7 @@
 import serial, time, socket
 
 commandPacketLength = 4
-serversocket = 
+serversocket = None
 clientsocket = None
 serialConnection = None
 go = True
@@ -15,11 +15,11 @@ def waitForConnection():
 				sys.stdout.flush()
 				(clientsocket, address) = serversocket.accept()
 				connected = True
-				print 'Client connected'
+				print('Client connected')
 			except Exception as msg:
-				print 'Client connection failed with message:'
-				print msg
-				print 'I will retry connecting in one second.'
+				print('Client connection failed with message:')
+				print(msg)
+				print('I will retry connecting in one second.')
 				time.sleep(1)
 
 def resetClient():
@@ -57,7 +57,7 @@ def serverSetup():
 	serversocket.bind(('', 12345))
 	# listen for only one connection
 	serversocket.listen(1)
-	print "Wifi server started"
+	print("Wifi server started")
 
 def main():
 	serialConnection = getSerialConnection()
