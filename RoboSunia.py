@@ -1,4 +1,4 @@
-import serial, time, socket
+import serial, time, socket, sys
 
 class RoboSunia:
 	commandPacketLength = 4
@@ -49,6 +49,8 @@ class RoboSunia:
 	def exitGracefully(self):
 		if self.clientsocket:
 			self.clientsocket.close()
+		if self.serversocket:
+			self.serversocket.close()
 		self.serialConnection.write(b'reset')
 		self.serialConnection.close()
 
@@ -63,24 +65,28 @@ class RoboSunia:
 	def __init__(self):
 		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
-			self.serverSetup()
-			self.waitForConnection()
-			while self.go:
-				# 4 because there are only 4 bytes in a command packet
-				# data[0:2] are the dirs
-				# data[2:4] are the pwms
-				data = self.clientsocket.recv(self.commandPacketLength)	
-				if len(data) == 0:
-					self.resetClient()
-					self.waitForConnection()
-				elif len(data) == self.commandPacketLength:
-					if data == 'quit':
-						self.go = False
-					else:
-						for i in range(len(data)):
-							print(int(data[i]))
-						self.serialConnection.write(data)
-			self.exitGracefully()
+			try:
+				self.serverSetup()
+				self.waitForConnection()
+				while self.go:
+					# 4 because there are only 4 bytes in a command packet
+					# data[0:2] are the dirs
+					# data[2:4] are the pwms
+					data = self.clientsocket.recv(self.commandPacketLength)	
+					if len(data) == 0:
+						self.resetClient()
+						self.waitForConnection()
+					elif len(data) == self.commandPacketLength:
+						if data == 'quit':
+							self.go = False
+						else:
+							for i in range(len(data)):
+								print(int(data[i]))
+							self.serialConnection.write(data)
+				self.exitGracefully()
+			except Exception as msg: # This should be a KeyboardException, but I wanna catch other ones too if necessary
+				print(msg)
+				self.exitGracefully()
 		else:
 			print("Companion Arduino could not be found. Try rebooting.")
 
