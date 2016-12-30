@@ -34,7 +34,7 @@ public class Main extends Thread {
 	
 	public static void terminate() throws IOException {
 		// send terminating signal
-		wt.sendByte((byte) (1<<7));
+		wt.sendBytes("reset");
 		wt.close();
 		System.exit(0);
 	}
@@ -86,7 +86,7 @@ public class Main extends Thread {
 	public void run() {
 		for(;;) {
 			try {
-				wt.sendByte(getMotorStates());
+				wt.sendBytes(getMotorStates());
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

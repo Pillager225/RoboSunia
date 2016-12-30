@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 public class WebTalker {
 
 //	String hostName = "171.66.76.42";
-	String hostName = "192.168.1.232";
+	String hostName = "192.168.1.215";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;
@@ -28,7 +28,12 @@ public class WebTalker {
         } 
 	}
 	
-	public void sendByte(byte b) {
+	public void sendBytes(byte[] b) {
+		out.println(b);
+		System.out.println("Sending " + b);
+	}
+	
+	public void sendBytes(String b) {
 		out.println(b);
 		System.out.println("Sending " + b);
 	}
