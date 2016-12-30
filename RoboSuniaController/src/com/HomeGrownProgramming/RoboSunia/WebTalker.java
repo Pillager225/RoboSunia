@@ -30,7 +30,11 @@ public class WebTalker {
 	
 	public void sendBytes(byte[] b) {
 		out.println(b);
-		System.out.println("Sending " + b);
+		System.out.print("Sending ");
+		for(int i = 0; i < b.length; i++) {
+			System.out.print((int)b[i]);
+		}
+		System.out.print('\n');
 	}
 	
 	public void sendBytes(String b) {
