@@ -24,10 +24,14 @@ class RoboSunia:
 					time.sleep(1)
 
 	def resetClient(self):
-		ser.write([1, 1, 0, 0])
+		self.serialConnection.write([0, 0, 0, 0])
 		if self.clientsocket:
 			self.clientsocket.close()
-		self.clientsocket = None
+			self.clientsocket = None
+		if self.serversocket:
+			self.serversocket.close()
+			self.serversocket = None
+		self.serverSetup()
 
 	def getSerialConnection(self):
 		portPrefix = "\\\\.\\COM"
@@ -59,7 +63,7 @@ class RoboSunia:
 		self.serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.serversocket.bind(('', 12345))
 		# listen for only one connection
-		self.serversocket.listen(1)
+		self.serversocket.listen(0)
 		print("Wifi server started")
 
 	def __init__(self):
@@ -69,25 +73,32 @@ class RoboSunia:
 				self.serverSetup()
 				self.waitForConnection()
 				while self.go:
-					# 4 because there are only 4 bytes in a command packet
-					# data[0:2] are the dirs
-					# data[2:4] are the pwms
-					data = self.clientsocket.recv(self.commandPacketLength)	
-					if len(data) == 0:
-						self.resetClient()
-						self.waitForConnection()
-					elif len(data) == self.commandPacketLength:
-						if data == 'quit':
-							self.go = False
-						elif data == 'rese':
+					try:
+						# 4 because there are only 4 bytes in a command packet
+						# data[0:2] are the dirs
+						# data[2:4] are the pwms
+						data = self.clientsocket.recv(self.commandPacketLength)	
+						if len(data) == 0:
 							self.resetClient()
 							self.waitForConnection()
-						else:
-							print(data)
-							self.serialConnection.write(data)
+						elif len(data) == self.commandPacketLength:
+							if data == 'quit':
+								self.go = False
+							elif data == 'rese':
+								self.resetClient()
+								self.waitForConnection()
+							else:
+								print(data)
+								self.serialConnection.write(data)
+					except ConnectionError as msg:
+						print("A connection error was detected. Its error was")
+						print(msg)
+						print("Resetting robot.")
+						self.resetClient()
+						self.waitForConnection()
 				self.exitGracefully()
-			except KeyboardInterrupt as msg: # This should be a KeyboardException, but I wanna catch other ones too if necessary
-				print(msg)
+			except KeyboardInterrupt: 
+				print("Keyboard interrupt detected. Exiting program.")
 				self.exitGracefully()
 		else:
 			print("Companion Arduino could not be found. Try rebooting.")
