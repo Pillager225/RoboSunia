@@ -34,13 +34,13 @@ public class Main extends Thread {
 	
 	public static void terminate() throws IOException {
 		// send terminating signal
-		wt.sendBytes("reset");
+		wt.send("rese");
 		wt.close();
 		System.exit(0);
 	}
 	
 	// This will turn the boolean values about the motor states stored in ka into a string.
-	private byte[] getMotorStates() {
+	private int[] getMotorStates() {
 		if(ka.forwardPressed) {
 			if(ka.leftPressed) {
 				ka.lmState = 0;
@@ -70,14 +70,14 @@ public class Main extends Thread {
 			ka.lmState = 1;
 			ka.rmState = -1;
 		}
-		byte[] b = new byte[4];
-		b[0] = (byte)(ka.lmState == -1 ? 0 : 1);
+		int[] b = new int[4];
+		b[0] = (ka.lmState == -1 ? 0 : 1);
 		if(ka.lmState != 0) {
-			b[2] = (byte)MAX_PWM;
+			b[2] = MAX_PWM;
 		}
 		b[1] = (byte)(ka.rmState == -1 ? 0 : 1);
 		if(ka.rmState != 0) {
-			b[3] = (byte)MAX_PWM;
+			b[3] = MAX_PWM;
 		}
 		return b;
 	}
@@ -86,7 +86,7 @@ public class Main extends Thread {
 	public void run() {
 		for(;;) {
 			try {
-				wt.sendBytes(getMotorStates());
+				wt.send(getMotorStates());
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
