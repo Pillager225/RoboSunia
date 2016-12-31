@@ -12,7 +12,7 @@ public class Main extends Thread {
 	// 3rd byte is the PWM value for motor 1 (0-255)
 	// 4th byte is the PWM value for motor 2 (0-255)
 	
-	private static final int MAX_PWM = 170;
+	private static final int MAX_PWM = 100;
 	
 	private static WebTalker wt;
 	private KeyAction ka;
@@ -71,11 +71,11 @@ public class Main extends Thread {
 			ka.rmState = -1;
 		}
 		char[] b = new char[4];
-		b[0] = (char) (ka.lmState == -1 ? 0 : 1);
+		b[0] = (char) (ka.lmState == -1 ? 1 : 0);
 		if(ka.lmState != 0) {
 			b[2] = (char)MAX_PWM;
 		}
-		b[1] = (char)(ka.rmState == -1 ? 0 : 1);
+		b[1] = (char)(ka.rmState == -1 ? 1 : 0);
 		if(ka.rmState != 0) {
 			b[3] = (char)MAX_PWM;
 		}

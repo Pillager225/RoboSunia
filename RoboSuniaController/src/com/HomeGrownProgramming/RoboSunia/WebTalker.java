@@ -32,7 +32,7 @@ public class WebTalker {
 		out.println(b);
 		System.out.print("Sending ");
 		for(int i = 0; i < b.length; i++) {
-			System.out.print(b[i]);
+			System.out.print((int)b[i]);
 		}
 		System.out.print('\n');
 	}
