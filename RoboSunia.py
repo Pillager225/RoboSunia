@@ -1,4 +1,4 @@
-import serial, time, socket, sys
+import serial, time, socket, sys, struct
 
 class RoboSunia:
 	commandPacketLength = 4
@@ -83,6 +83,7 @@ class RoboSunia:
 							self.resetClient()
 							self.waitForConnection()
 						else:
+							struct.unpack('i', data[0:2])
 							print(data)
 							self.serialConnection.write(data)
 				self.exitGracefully()

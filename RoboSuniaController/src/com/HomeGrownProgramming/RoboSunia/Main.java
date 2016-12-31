@@ -40,7 +40,7 @@ public class Main extends Thread {
 	}
 	
 	// This will turn the boolean values about the motor states stored in ka into a string.
-	private int[] getMotorStates() {
+	private char[] getMotorStates() {
 		if(ka.forwardPressed) {
 			if(ka.leftPressed) {
 				ka.lmState = 0;
@@ -70,14 +70,14 @@ public class Main extends Thread {
 			ka.lmState = 1;
 			ka.rmState = -1;
 		}
-		int[] b = new int[4];
-		b[0] = (ka.lmState == -1 ? 0 : 1);
+		char[] b = new char[4];
+		b[0] = (char) (ka.lmState == -1 ? 0 : 1);
 		if(ka.lmState != 0) {
-			b[2] = MAX_PWM;
+			b[2] = (char)MAX_PWM;
 		}
-		b[1] = (byte)(ka.rmState == -1 ? 0 : 1);
+		b[1] = (char)(ka.rmState == -1 ? 0 : 1);
 		if(ka.rmState != 0) {
-			b[3] = MAX_PWM;
+			b[3] = (char)MAX_PWM;
 		}
 		return b;
 	}

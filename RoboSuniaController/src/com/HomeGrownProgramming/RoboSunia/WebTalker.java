@@ -28,7 +28,7 @@ public class WebTalker {
         } 
 	}
 	
-	public void send(int[] b) {
+	public void send(char[] b) {
 		out.println(b);
 		System.out.print("Sending ");
 		for(int i = 0; i < b.length; i++) {
