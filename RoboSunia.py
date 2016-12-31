@@ -79,9 +79,11 @@ class RoboSunia:
 					elif len(data) == self.commandPacketLength:
 						if data == 'quit':
 							self.go = False
+						elif data == 'rese':
+							self.resetClient()
+							self.waitForConnection()
 						else:
-							for i in range(len(data)):
-								print(int(data[i]))
+							print(data)
 							self.serialConnection.write(data)
 				self.exitGracefully()
 			except Exception as msg: # This should be a KeyboardException, but I wanna catch other ones too if necessary
