@@ -1,4 +1,4 @@
-import serial, time, socket, sys, struct
+import serial, time, socket, sys
 
 class RoboSunia:
 	commandPacketLength = 4
@@ -83,11 +83,10 @@ class RoboSunia:
 							self.resetClient()
 							self.waitForConnection()
 						else:
-							struct.unpack('i', data[0:2])
 							print(data)
 							self.serialConnection.write(data)
 				self.exitGracefully()
-			except Exception as msg: # This should be a KeyboardException, but I wanna catch other ones too if necessary
+			except KeyboardInterrupt as msg: # This should be a KeyboardException, but I wanna catch other ones too if necessary
 				print(msg)
 				self.exitGracefully()
 		else:
