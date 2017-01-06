@@ -15,4 +15,5 @@ void loop() {
   handleDistSensors();
   controlPWMs();
   handleSerialInput();
+  delay(100);
 }

@@ -1,4 +1,4 @@
-import serial, time, socket, sys, thread
+import serial, time, socket, sys, _thread
 
 #10.21.163.151
 
@@ -73,7 +73,9 @@ class RoboSunia:
 		try:
 			serData = self.serialConnection.read(16).decode('utf-8')
 			if serData:
-				serData = serData.split('\n').split('\r').split('\t').split()
+				serDataString = ''.join(str(e) for e in serData)
+				print(serDataString)
+				serData = serDataString.split('\n').split('\r').split('\t').split()
 				distance = serData[0]+'\0'
 				if self.clientsocket:
 					self.clientsocket.send(distance)
@@ -110,7 +112,7 @@ class RoboSunia:
 	def __init__(self):
 		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
-			thread.start_new_thread(self.handleSerialConnection, ())	
+			_thread.start_new_thread(self.handleSerialConnection, ())	
 			try:
 				self.serverSetup()
 				self.waitForConnection()
