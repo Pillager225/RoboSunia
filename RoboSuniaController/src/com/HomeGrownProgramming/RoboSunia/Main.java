@@ -1,5 +1,6 @@
 package com.HomeGrownProgramming.RoboSunia;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -46,6 +47,8 @@ public class Main extends Thread {
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setSize(600,400);
 		frame.setLocation(10,30);
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 		JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, MIN_PWM, MAX_PWM, limitPWM);
 		speedSlider.setMajorTickSpacing(10);
 		speedSlider.setMinorTickSpacing(5);
@@ -72,11 +75,14 @@ public class Main extends Thread {
 		sliderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		speedSlider.setFocusable(false);
 		distanceLabel = new JLabel("Waiting for first reading", JLabel.CENTER);
+		distanceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		distanceLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 		ka = new KeyAction();
-		frame.addKeyListener(ka);
-		frame.add(sliderLabel);
-		frame.add(speedSlider);
-		frame.add(distanceLabel);
+		mainPanel.addKeyListener(ka);
+		mainPanel.add(sliderLabel);
+		mainPanel.add(speedSlider);
+		mainPanel.add(distanceLabel);
+		frame.add(mainPanel);
 		//frame.add(kaContainer);
 		//frame.pack();
 		frame.setVisible(true);
@@ -143,7 +149,7 @@ public class Main extends Thread {
 		for(;;) {
 			try {
 				wt.send(getMotorStates());
-				distanceLabel.setText(wt.read());
+				distanceLabel.setText("Sensed Distance: " + wt.read());
 				Thread.sleep(100);
 			} catch (InterruptedException | IOException e) {
 				e.printStackTrace();
