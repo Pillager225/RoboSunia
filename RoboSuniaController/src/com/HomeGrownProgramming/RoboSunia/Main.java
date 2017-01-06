@@ -31,6 +31,7 @@ public class Main extends Thread {
 	private int limitPWM = 100;
 	private int lmPWM = 0, rmPWM = 0;
 	private int PWMInc = 30;
+	private JLabel distanceLabel;
 	
 	private static WebTalker wt;
 	private KeyAction ka;
@@ -70,10 +71,12 @@ public class Main extends Thread {
 		JLabel sliderLabel = new JLabel("Speed Limit", JLabel.CENTER);
 		sliderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		speedSlider.setFocusable(false);
+		distanceLabel = new JLabel("Waiting for first reading", JLabel.CENTER);
 		ka = new KeyAction();
 		frame.addKeyListener(ka);
 		frame.add(sliderLabel);
 		frame.add(speedSlider);
+		frame.add(distanceLabel);
 		//frame.add(kaContainer);
 		//frame.pack();
 		frame.setVisible(true);
@@ -140,8 +143,9 @@ public class Main extends Thread {
 		for(;;) {
 			try {
 				wt.send(getMotorStates());
+				distanceLabel.setText(wt.read());
 				Thread.sleep(100);
-			} catch (InterruptedException e) {
+			} catch (InterruptedException | IOException e) {
 				e.printStackTrace();
 			}
 		}

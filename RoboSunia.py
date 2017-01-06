@@ -1,4 +1,6 @@
-import serial, time, socket, sys
+import serial, time, socket, sys, thread
+
+#10.21.163.151
 
 class RoboSunia:
 	commandPacketLength = 4
@@ -67,36 +69,53 @@ class RoboSunia:
 		self.serversocket.listen(0)
 		print("Wifi server started")
 
+	def handleSerialConnection(self):
+		try:
+			serData = self.serialConnection.read(16).decode('utf-8')
+			if serData:
+				serData = serData.split('\n').split('\r').split('\t').split()
+				distance = serData[0]+'\0'
+				if self.clientsocket:
+					self.clientsocket.send(distance)
+		except Exception as msg:
+			print("An error occurred while communicating with the Arduino. The error was:")
+			print(msg)
+			print("Resetting robot.")
+
+	def handleWifiConnection(self):
+		try:
+			# 4 because there are only 4 bytes in a command packet
+			# data[0:2] are the dirs
+			# data[2:4] are the pwms
+			data = self.clientsocket.recv(self.commandPacketLength)	
+			if len(data) == 0:
+				self.resetClient()
+				self.waitForConnection()
+			elif len(data) == self.commandPacketLength:
+				if data == 'quit':
+					self.go = False
+				elif data == 'rese':
+					self.resetClient()
+					self.waitForConnection()
+				else:
+					print(data)
+					self.serialConnection.write(data)
+		except ConnectionError as msg:
+			print("A connection error was detected. Its error was")
+			print(msg)
+			print("Resetting robot.")
+			self.resetClient()
+			self.waitForConnection()
+
 	def __init__(self):
 		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
+			thread.start_new_thread(self.handleSerialConnection, ())	
 			try:
 				self.serverSetup()
 				self.waitForConnection()
 				while self.go:
-					try:
-						# 4 because there are only 4 bytes in a command packet
-						# data[0:2] are the dirs
-						# data[2:4] are the pwms
-						data = self.clientsocket.recv(self.commandPacketLength)	
-						if len(data) == 0:
-							self.resetClient()
-							self.waitForConnection()
-						elif len(data) == self.commandPacketLength:
-							if data == 'quit':
-								self.go = False
-							elif data == 'rese':
-								self.resetClient()
-								self.waitForConnection()
-							else:
-								print(data)
-								self.serialConnection.write(data)
-					except ConnectionError as msg:
-						print("A connection error was detected. Its error was")
-						print(msg)
-						print("Resetting robot.")
-						self.resetClient()
-						self.waitForConnection()
+					self.handleWifiConnection()
 				self.exitGracefully()
 			except KeyboardInterrupt: 
 				print("Keyboard interrupt detected. Exiting program.")

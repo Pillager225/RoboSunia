@@ -9,7 +9,8 @@ import java.net.UnknownHostException;
 public class WebTalker {
 
 //	String hostName = "171.66.76.42";
-	String hostName = "192.168.1.216";
+//	String hostName = "192.168.1.216";
+	String hostName = "10.21.163.151";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;
@@ -43,6 +44,17 @@ public class WebTalker {
 	public void send(String b) {
 		out.println(b);
 		System.out.println("Sending " + b);
+	}
+	
+	public String read() throws IOException {
+		String returnString = "";
+		int avail = in.available();
+		if(avail != 0) {
+			byte[] b = new byte[avail];
+			in.read(b, 0, avail);
+			returnString = new String(b, "UTF-8");
+		}
+		return returnString;
 	}
 	
 	public void close() throws IOException {
