@@ -45,6 +45,7 @@ class RoboSunia:
 				pass
 			else:
 				# len('Arduino') == 7
+				ser.write(b'reset')
 				if b'Arduino' == ser.read(7):
 					ser.write(b'connected')
 					return ser
