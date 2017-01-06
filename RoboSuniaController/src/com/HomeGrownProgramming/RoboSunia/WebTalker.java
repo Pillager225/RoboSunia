@@ -1,5 +1,6 @@
 package com.HomeGrownProgramming.RoboSunia;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -8,16 +9,18 @@ import java.net.UnknownHostException;
 public class WebTalker {
 
 //	String hostName = "171.66.76.42";
-	String hostName = "192.168.1.215";
+	String hostName = "192.168.1.216";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;
+    BufferedInputStream in;
     
 	public WebTalker() {
 		try {
 			socket = new Socket(hostName, portNumber);
 	        socket.setTcpNoDelay(true);
 	        out = new PrintWriter(socket.getOutputStream(), true);
+			in = new BufferedInputStream(socket.getInputStream());
 	        System.out.println("Web Talker started.");
 		} catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
@@ -32,7 +35,7 @@ public class WebTalker {
 		out.println(b);
 		System.out.print("Sending ");
 		for(int i = 0; i < b.length; i++) {
-			System.out.print(b[i]);
+			System.out.print((int)b[i]);
 		}
 		System.out.print('\n');
 	}
