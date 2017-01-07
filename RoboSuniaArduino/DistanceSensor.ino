@@ -59,7 +59,6 @@ void handleDistSensors() {
   int curDist = getCurrentDistance(FRONT_SENSOR);  
   distanceReadings[FRONT_SENSOR][readingIndex[FRONT_SENSOR]++] = curDist;
   readingIndex[FRONT_SENSOR] = readingIndex[FRONT_SENSOR] == numOfReadings ? 0 : readingIndex[FRONT_SENSOR];
-  // TODO report back to user
   Serial.println(curDist);
 }
 

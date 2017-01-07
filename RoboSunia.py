@@ -75,7 +75,7 @@ class RoboSunia:
 			if serData:
 				serDataString = ''.join(str(e) for e in serData)
 				print(serDataString)
-				serData = serDataString.split('\n').split('\r').split('\t').split()
+				serData = serDataString.split()
 				distance = serData[0]+'\0'
 				if self.clientsocket:
 					self.clientsocket.send(distance)
@@ -100,8 +100,11 @@ class RoboSunia:
 					self.resetClient()
 					self.waitForConnection()
 				else:
-					print(data)
-					self.serialConnection.write(data)
+					preData = data.decode('utf-8').split()
+					if len(preData) == 1:
+						data = bytes(preData[0], 'utf-8')
+						print(data)
+						self.serialConnection.write(data)
 		except ConnectionError as msg:
 			print("A connection error was detected. Its error was")
 			print(msg)
@@ -123,7 +126,7 @@ class RoboSunia:
 				print("Keyboard interrupt detected. Exiting program.")
 				self.exitGracefully()
 		else:
-			print("Companion Arduino could not be found. Try rebooting.")
+			print("Companion Arduino could not be found. Try once more or reboot.")
 
 if __name__ == "__main__":
 	RoboSunia()

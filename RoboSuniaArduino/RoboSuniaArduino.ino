@@ -12,8 +12,10 @@ void setup() {
 }
 
 void loop() {
-  handleDistSensors();
-  controlPWMs();
+  if(millis()-lasttime > 100) {
+    handleDistSensors();
+    //controlPWMs();
+    lasttime = millis();
+  }
   handleSerialInput();
-  delay(100);
 }
