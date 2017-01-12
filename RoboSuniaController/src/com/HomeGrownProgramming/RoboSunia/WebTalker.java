@@ -9,12 +9,14 @@ import java.net.UnknownHostException;
 public class WebTalker {
 
 //	String hostName = "171.66.76.42";
-//	String hostName = "192.168.1.216";
+//	String hostName = "171.64.20.35"; 	// Wired
+//	String hostName = "192.168.1.216";	// home
 	String hostName = "10.21.163.151";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;
     BufferedInputStream in;
+    boolean connected = false;
     
 	public WebTalker() {
 		try {
@@ -22,6 +24,7 @@ public class WebTalker {
 	        socket.setTcpNoDelay(true);
 	        out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedInputStream(socket.getInputStream());
+			connected = true;
 	        System.out.println("Web Talker started.");
 		} catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

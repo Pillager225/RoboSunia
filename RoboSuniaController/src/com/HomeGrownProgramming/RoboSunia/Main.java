@@ -1,19 +1,15 @@
 package com.HomeGrownProgramming.RoboSunia;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -34,12 +30,23 @@ public class Main extends Thread {
 	private int PWMInc = 30;
 	private JLabel distanceLabel;
 	
-	private static WebTalker wt;
+	private static WebTalker wt = null;
 	private KeyAction ka;
+	private static boolean go = true; 
 	
 	public Main() {
 		makeFrame();
 		wt = new WebTalker();
+	}
+	
+	class WindowListener extends WindowAdapter {
+		public void windowClosing(WindowEvent e) {
+			try {
+				Main.terminate();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 	private void makeFrame() {
@@ -47,6 +54,7 @@ public class Main extends Thread {
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setSize(600,400);
 		frame.setLocation(10,30);
+		frame.addWindowListener(new WindowListener());
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 		JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, MIN_PWM, MAX_PWM, limitPWM);
@@ -78,7 +86,8 @@ public class Main extends Thread {
 		distanceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		distanceLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
 		ka = new KeyAction();
-		mainPanel.addKeyListener(ka);
+		mainPanel.setFocusable(false);
+		frame.addKeyListener(ka);
 		mainPanel.add(sliderLabel);
 		mainPanel.add(speedSlider);
 		mainPanel.add(distanceLabel);
@@ -90,8 +99,11 @@ public class Main extends Thread {
 	
 	public static void terminate() throws IOException {
 		// send terminating signal
-		wt.send("rese");
-		wt.close();
+		if(wt != null && wt.connected) {
+			wt.send("rese");
+			wt.close();
+		}
+		go = false;
 		System.exit(0);
 	}
 	
@@ -146,10 +158,12 @@ public class Main extends Thread {
 	
 	@Override
 	public void run() {
-		for(;;) {
+		while(go) {
 			try {
 				wt.send(getMotorStates());
-				distanceLabel.setText("Sensed Distance: " + wt.read());
+				String input = wt.read();
+				System.out.println(input);
+				distanceLabel.setText("Sensed Distance: " + input);
 				Thread.sleep(100);
 			} catch (InterruptedException | IOException e) {
 				e.printStackTrace();

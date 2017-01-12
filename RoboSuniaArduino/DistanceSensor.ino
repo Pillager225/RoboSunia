@@ -55,10 +55,24 @@ int getCurrentDistance(int inputPinsIndex) {
   return findDistanceFromAnalogVal(analogVal);
 }
 
+String interpertDistanceReadings(int sensor) {
+  int prevIndex = readingIndex-1 < 0 ? numOfReadings-1 : readingIndex[sensor]-1;
+  int prevprevIndex = prevIndex-1 < 0 ? numOfReadings-1 : prevIndex-1;
+  if((distanceReadings[sensor][prevprevIndex] > 2 && distanceReadings[sensor][prevprevIndex] < 7)
+      && distanceReadings[sensor][prevIndex] < distanceReadings[sensor][prevprevIndex] 
+      && distanceReadings[sensor][readingIndex[sensor]] > distanceReadings[sensor][prevprevIndex]+2) {
+    return String("Possibly too close");
+  }
+  if(distanceReadings[sensor][readingIndex[sensor]] >= 31) {
+    return String("31+ inches");
+  }
+  return String(distanceReadings[sensor][readingIndex[sensor]])+ " inches";
+}
+
 void handleDistSensors() {
   int curDist = getCurrentDistance(FRONT_SENSOR);  
-  distanceReadings[FRONT_SENSOR][readingIndex[FRONT_SENSOR]++] = curDist;
-  readingIndex[FRONT_SENSOR] = readingIndex[FRONT_SENSOR] == numOfReadings ? 0 : readingIndex[FRONT_SENSOR];
-  Serial.println(curDist);
+  distanceReadings[FRONT_SENSOR][readingIndex[FRONT_SENSOR]] = curDist;
+  readingIndex[FRONT_SENSOR] = readingIndex[FRONT_SENSOR]+1 == numOfReadings ? 0 : readingIndex[FRONT_SENSOR]+1;
+  Serial.println(interpertDistanceReadings(FRONT_SENSOR));
 }
 
