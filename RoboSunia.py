@@ -75,7 +75,7 @@ class RoboSunia:
 			serData = self.serialConnection.read(16).decode('utf-8')
 			if serData:
 				serDataString = ''.join(str(e) for e in serData)
-				if debugging:
+				if self.debugging:
 					print(serDataString)
 				serData = serDataString.split()
 				distance = serData[0]+'\0'
@@ -105,7 +105,7 @@ class RoboSunia:
 					preData = data.decode('utf-8').split()
 					if len(preData) == 1:
 						data = bytes(preData[0], 'utf-8')
-						if debugging:
+						if self.debugging:
 							print(data)
 						self.serialConnection.write(data)
 		except ConnectionError as msg:
@@ -119,7 +119,7 @@ class RoboSunia:
 		parser = argparse.ArgumentParser(description="Arguments are for debuggin only.")
 		parser.add_argument('-d', dest='debugging', action="store_true", help="Enables debugging messages")
 		args = parser.parse_args()
-		debugging = args.debugging
+		self.debugging = args.debugging
 		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
 			_thread.start_new_thread(self.handleSerialConnection, ())	
