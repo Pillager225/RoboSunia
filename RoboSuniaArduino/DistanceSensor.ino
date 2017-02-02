@@ -63,16 +63,27 @@ String interpertDistanceReadings(int sensor) {
       && distanceReadings[sensor][readingIndex[sensor]] > distanceReadings[sensor][prevprevIndex]+2) {
     return String("Possibly too close");
   }
-  if(distanceReadings[sensor][readingIndex[sensor]] >= 31) {
+  if(distanceReadings[sensor][readingIndex[sensor]] == 0) {
     return String("31+ inches");
   }
   return String(distanceReadings[sensor][readingIndex[sensor]])+ " inches";
 }
 
+String padOutput(String o, int dLen) {
+  if(o.length() > dLen) {
+    return o;
+  }
+  int padding = dLen-o.length();
+  for(int i = 0; i < padding; i++) {
+    o += ' ';
+  }
+  return o;
+}
+
 void handleDistSensors() {
   int curDist = getCurrentDistance(FRONT_SENSOR);  
   distanceReadings[FRONT_SENSOR][readingIndex[FRONT_SENSOR]] = curDist;
+  Serial.println(padOutput(interpertDistanceReadings(FRONT_SENSOR), 18));
   readingIndex[FRONT_SENSOR] = readingIndex[FRONT_SENSOR]+1 == numOfReadings ? 0 : readingIndex[FRONT_SENSOR]+1;
-  Serial.println(interpertDistanceReadings(FRONT_SENSOR));
 }
 

@@ -12,7 +12,7 @@ void setup() {
 }
 
 void loop() {
-  if(millis()-lasttime > 100) {
+  if(millis()-lasttime > 1000) {
     handleDistSensors();
     //controlPWMs();
     lasttime = millis();
