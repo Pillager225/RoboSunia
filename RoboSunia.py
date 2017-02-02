@@ -1,21 +1,14 @@
-from multiprocessing import Queue
-from multiprocessing import Process
-from multiprocessing import Manager
-import serial, time, socket, sys, argparse, signal
+import serial, time, socket, sys, _thread, argparse
 
-distQueue = manager.Queue()
-commandQueue = manager.Queue()
+#10.21.163.151
 
-class WifiCommHandler(Process):
+class RoboSunia:
 	commandPacketLength = 4
 	serversocket = None
 	clientsocket = None
+	serialConnection = None
 	go = True
 	debugging = False
-
-	def __init__(self, debugging = False):
-		super(WifiCommHandler, self).__init__()
-		self.debugging = debugging
 
 	def waitForConnection(self):
 		if self.clientsocket == None:
@@ -34,7 +27,7 @@ class WifiCommHandler(Process):
 					time.sleep(1)
 
 	def resetClient(self):
-		commandQueue.put('stop')
+		self.serialConnection.write([0, 0, 0, 0])
 		if self.clientsocket:
 			self.clientsocket.close()
 			self.clientsocket = None
@@ -43,11 +36,31 @@ class WifiCommHandler(Process):
 			self.serversocket = None
 		self.serverSetup()
 
+	def getSerialConnection(self):
+		portPrefix = "\\\\.\\COM"
+		ser = None
+		# skip serial port 1 because that one is always some unknown device
+		for i in range(2, 9):
+			try:
+				ser = serial.Serial(portPrefix+str(i), 9600)
+				ser.timeout = 2
+			except Exception:
+				pass
+			else:
+				# len('Arduino') == 7
+				ser.write(b'reset')
+				if b'Arduino' == ser.read(7):
+					ser.write(b'connected')
+					return ser
+		return None
+
 	def exitGracefully(self):
 		if self.clientsocket:
 			self.clientsocket.close()
 		if self.serversocket:
 			self.serversocket.close()
+		self.serialConnection.write(b'reset')
+		self.serialConnection.close()
 
 	def serverSetup(self):
 		self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,6 +69,24 @@ class WifiCommHandler(Process):
 		# listen for only one connection
 		self.serversocket.listen(0)
 		print("Wifi server started")
+
+	def handleSerialConnection(self):
+		while self.go:
+			try:
+				self.serialConnection.reset_input_buffer()
+				serData = self.serialConnection.read(19).decode('utf-8')
+				if serData:
+					serDataString = ''.join(str(e) for e in serData)
+					if self.debugging:
+						print(serDataString)
+					serData = serDataString.split()
+					distance = serData[0]+'\0'
+					if self.clientsocket:
+						self.clientsocket.send(distance)
+			except Exception as msg:
+				print("An error occurred while communicating with the Arduino. The error was:")
+				print(msg)
+				print("Resetting robot.")
 
 	def handleWifiConnection(self):
 		try:
@@ -78,9 +109,7 @@ class WifiCommHandler(Process):
 						data = bytes(preData[0], 'utf-8')
 						if self.debugging:
 							print(data)
-						commandQueue.put(data)
-			while not distQueue.empty():
-				self.clientsocket.send(distQueue.get_nowait())	
+						self.serialConnection.write(data)
 		except ConnectionError as msg:
 			print("A connection error was detected. Its error was")
 			print(msg)
@@ -88,94 +117,26 @@ class WifiCommHandler(Process):
 			self.resetClient()
 			self.waitForConnection()
 
-	def run(self):
-		try:
-			self.serverSetup()
-			self.waitForConnection()
-			while self.go:
-				lasttime = time.clock()
-				self.handleWifiConnection()
-				while time.clock()-lasttime < .1:
-					time.sleep(.005)
-		except KeyboardInterrupt: 
-			print("Keyboard interrupt detected. Exiting program.")
-		self.exitGracefully()
-
-class SerialCommHandler(Process):
-	serialConnection = None
-	debugging = False
-	go = True
-
-	def __init__(self, debugging = False):
-		super(SerialCommHandler, self).__init__()
-		self.debugging = debugging
+	def __init__(self):
+		parser = argparse.ArgumentParser(description="Arguments are for debuggin only.")
+		parser.add_argument('-d', dest='debugging', action="store_true", help="Enables debugging messages")
+		args = parser.parse_args()
+		self.debugging = args.debugging
 		self.serialConnection = self.getSerialConnection()
-		if not self.serialConnection:
-			print("Companion Arduino could not be found. Try once more or reboot.")
-			sys.exit(-1)
-
-	def getSerialConnection(self):
-		portPrefix = "\\\\.\\COM"
-		ser = None
-		# skip serial port 1 because that one is always some unknown device
-		for i in range(2, 9):
+		if self.serialConnection:
+			_thread.start_new_thread(self.handleSerialConnection, ())	
 			try:
-				ser = serial.Serial(portPrefix+str(i), 9600)
-				ser.timeout = 1.5
-			except Exception:
-				pass
-			else:
-				# len('Arduino') == 7
-				ser.write(b'reset')
-				if b'Arduino' == ser.read(7):
-					ser.write(b'connected')
-					return ser
-		return None
-
-	def exitGracefully(self):
-		self.serialConnection.write(b'reset')
-		self.serialConnection.close()
-
-	def run(self):
-		try:
-			while self.go:
-				try:
-					while not commandQueue.empty():
-						d = commandQueue.get_nowait()
-						if d != 'stop':
-							self.serialConnection.write(d)
-						else:
-							self.serialConnection.write([0, 0, 0, 0])
-					self.serialConnection.reset_input_buffer()
-					serData = self.serialConnection.read(19).decode('utf-8')
-					if serData:
-						serDataString = ''.join(str(e) for e in serData)
-						if self.debugging:
-							print(serDataString)
-						serData = serDataString.split()
-						distance = serData[0]+'\0'
-						distQueue.put(distance)
-				except Exception as msg:
-					print("An error occurred while communicating with the Arduino. The error was:")
-					print(msg)
-					print("Resetting robot.")
-		except KeyboardInterrupt: 
-			print("Keyboard interrupt detected. Exiting program.")
-		self.exitGracefully()
-
+				self.serverSetup()
+				self.waitForConnection()
+				while self.go:
+					self.handleWifiConnection()
+					time.sleep(.1)
+				self.exitGracefully()
+			except KeyboardInterrupt: 
+				print("Keyboard interrupt detected. Exiting program.")
+				self.exitGracefully()
+		else:
+			print("Companion Arduino could not be found. Try once more or reboot.")
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Arguments are for debuggin only.")
-	parser.add_argument('-d', dest='debugging', action="store_true", help="Enables debugging messages")
-	args = parser.parse_args()
-	debugging = args.debugging
-	wifi = WifiCommHandler(debugging)
-	serial = SerialCommHandler(debugging)
-	wifi.start()
-	serial.start()
-	# Catch SIGINT from ctrl-c when run interactively.
-	signal.signal(signal.SIGINT, self.signal_handler)
-	# Catch SIGTERM from kill when running as a daemon.
-	signal.signal(signal.SIGTERM, self.signal_handler)
-	# This thread of execution will sit here until a signal is caught
-	signal.pause()
+	RoboSunia()
