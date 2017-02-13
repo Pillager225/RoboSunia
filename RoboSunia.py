@@ -71,22 +71,21 @@ class RoboSunia:
 		print("Wifi server started")
 
 	def handleSerialConnection(self):
-		while self.go:
-			try:
-				self.serialConnection.reset_input_buffer()
-				serData = self.serialConnection.read(19).decode('utf-8')
-				if serData:
-					serDataString = ''.join(str(e) for e in serData)
-					if self.debugging:
-						print(serDataString)
-					serData = serDataString.split()
-					distance = serData[0]+'\0'
-					if self.clientsocket:
-						self.clientsocket.send(distance)
-			except Exception as msg:
-				print("An error occurred while communicating with the Arduino. The error was:")
-				print(msg)
-				print("Resetting robot.")
+		try:
+			self.serialConnection.reset_input_buffer()
+			serData = self.serialConnection.read(32).decode('utf-8')
+			if serData:
+				serDataString = ''.join(str(e) for e in serData)
+				if self.debugging:
+					print(serDataString)
+				serData = serDataString.split()
+				distance = serData[0]+'\0'
+				if self.clientsocket:
+					self.clientsocket.send(distance)
+		except Exception as msg:
+			print("An error occurred while communicating with the Arduino. The error was:")
+			print(msg)
+			print("Resetting robot.")
 
 	def handleWifiConnection(self):
 		try:
@@ -124,13 +123,12 @@ class RoboSunia:
 		self.debugging = args.debugging
 		self.serialConnection = self.getSerialConnection()
 		if self.serialConnection:
-			_thread.start_new_thread(self.handleSerialConnection, ())	
 			try:
 				self.serverSetup()
 				self.waitForConnection()
 				while self.go:
 					self.handleWifiConnection()
-					time.sleep(.1)
+					self.handleSerialConnection()
 				self.exitGracefully()
 			except KeyboardInterrupt: 
 				print("Keyboard interrupt detected. Exiting program.")

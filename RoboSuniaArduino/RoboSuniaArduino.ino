@@ -1,7 +1,6 @@
 #define MAX_BUFF_SIZE 64
 
 char input[MAX_BUFF_SIZE];
-unsigned long lasttime = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -12,10 +11,6 @@ void setup() {
 }
 
 void loop() {
-  if(millis()-lasttime > 1000) {
-    handleDistSensors();
-    //controlPWMs();
-    lasttime = millis();
-  }
   handleSerialInput();
+  handleDistSensors();
 }
