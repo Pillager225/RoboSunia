@@ -1,0 +1,17 @@
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.log
+*.pdb
+*.ilk
+*.ipch
+*.obj
+*.tlog
+*.pch
+*.enc
+*.idb
+*.suo
+*.db
