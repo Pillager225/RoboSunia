@@ -128,7 +128,10 @@ class RoboSunia:
 				self.waitForConnection()
 				while self.go:
 					self.handleWifiConnection()
+<<<<<<< HEAD
 					self.handleSerialConnection()
+=======
+>>>>>>> 2d4324b84f91ccc6724cd2b56820b548a043d94f
 				self.exitGracefully()
 			except KeyboardInterrupt: 
 				print("Keyboard interrupt detected. Exiting program.")
