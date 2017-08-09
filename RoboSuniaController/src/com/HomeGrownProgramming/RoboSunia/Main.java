@@ -100,11 +100,21 @@ public class Main extends Thread {
 	public static void terminate() throws IOException {
 		// send terminating signal
 		if(wt != null && wt.connected) {
-			wt.send("rese");
+//			wt.send("reset");
 			wt.close();
 		}
 		go = false;
 		System.exit(0);
+	}
+	
+	private String removePadding(String s) {
+		int i;
+		for(i = s.length()-1; i >= 0; i--) {
+			if(s.charAt(i) != ' ') {
+				break;
+			}
+		}
+		return s.substring(0, i+1);
 	}
 	
 	// This will turn the boolean values about the motor states stored in ka into a string.
@@ -138,7 +148,7 @@ public class Main extends Thread {
 			ka.lmState = 1;
 			ka.rmState = -1;
 		}
-		char[] b = new char[4];
+		char[] b = new char[5];
 		b[0] = (char) (ka.lmState == -1 ? 1 : 0);
 		b[1] = (char) (ka.rmState == -1 ? 1 : 0);
 		if(ka.lmState != 0) {
@@ -153,6 +163,7 @@ public class Main extends Thread {
 		}
 		b[2] = (char) lmPWM;
 		b[3] = (char) rmPWM;
+		b[4] = 13;
 		return b;
 	}
 	
@@ -162,8 +173,14 @@ public class Main extends Thread {
 			try {
 				wt.send(getMotorStates());
 				String input = wt.read();
-				System.out.println(input);
-				distanceLabel.setText("Sensed Distance: " + input);
+				if(input.length() > 0) {
+					input = removePadding(input);
+					//System.out.println(input);
+					for(int i = 0; i < input.length(); i++) {
+						System.out.print((int)input.charAt(i) + " ");
+					}
+					distanceLabel.setText("Sensed Distance: " + input);
+				}
 				Thread.sleep(100);
 			} catch (InterruptedException | IOException e) {
 				e.printStackTrace();

@@ -8,10 +8,11 @@ import java.net.UnknownHostException;
 
 public class WebTalker {
 
-	String hostName = "171.66.76.46";
+//	String hostName = "171.66.76.46";   // actual
 //	String hostName = "171.64.20.35"; 	// Wired
 //	String hostName = "192.168.1.216";	// home
 //	String hostName = "10.21.163.151";
+	String hostName = "127.0.0.1";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;
@@ -36,10 +37,11 @@ public class WebTalker {
 	}
 	
 	public void send(char[] b) {
-		out.println(b);
+		out.print(b);
+		out.flush();
 		System.out.print("Sending ");
 		for(int i = 0; i < b.length; i++) {
-			System.out.print((int)b[i]);
+			System.out.print((int)b[i] + " ");
 		}
 		System.out.print('\n');
 	}

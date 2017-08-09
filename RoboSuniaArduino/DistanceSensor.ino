@@ -12,7 +12,8 @@ int distanceReadings[numInputPins][numOfReadings];
 int readingIndex[numInputPins];
 int valSampleSize = 10;
 
-unsigned long lasttime = 0;
+long lasttimeDist = 0;
+
 
 void setupDistanceSensor() {
   for(int i = 0; i < numInputPins; i++) {
@@ -79,18 +80,16 @@ String padOutput(String o, int dLen) {
   for(int i = 0; i < padding; i++) {
     o += ' ';
   }
+  o += '\r';
   return o;
 }
 
 void handleDistSensors() {
-  if(millis()-lasttime >= 300) {
+  if(millis()-lasttimeDist >= 300) {
     int curDist = getCurrentDistance(FRONT_SENSOR);  
     distanceReadings[FRONT_SENSOR][readingIndex[FRONT_SENSOR]] = curDist;
-    Serial.println(padOutput(interpertDistanceReadings(FRONT_SENSOR), 32));
+    Serial.print(padOutput(interpertDistanceReadings(FRONT_SENSOR), 32));
     readingIndex[FRONT_SENSOR] = readingIndex[FRONT_SENSOR]+1 == numOfReadings ? 0 : readingIndex[FRONT_SENSOR]+1;
-  } else {
-    Serial.println(padOutput(readingIndex[FRONT_SENSOR], 32));
-  }
+    lasttimeDist = millis();
   }
 }
-

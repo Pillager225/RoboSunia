@@ -6,6 +6,8 @@ char curPWMs[] = {0, 0};
 double desiredAngularSpeed[] = {0, 0};
 double maxAngularSpeed = 100;
 
+unsigned long lasttime = 0;
+
 void handleSerialInput() {
   int len = getInput(input);
   if(len > 0) {
