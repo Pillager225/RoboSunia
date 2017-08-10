@@ -4,11 +4,6 @@
 
 #include <windows.h>
 #include <cstdio>
-#include <iostream>
-#include <cstdlib>
-#include <thread>
-#include <mutex>
-#include <cstring>
 #include "CommConnection.h"
 
 class SerialPort : public CommConnection {
@@ -17,6 +12,7 @@ protected:
 
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
+	void exitGracefully();
 public:
 	SerialPort();
 	SerialPort(char *portName);

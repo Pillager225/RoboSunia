@@ -4,7 +4,7 @@
 bool SocketServer::setupSocketServer(const char *port) {
 	WSADATA wsaData;
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
-	ZeroMemory(&hints, sizeof (hints));
+	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
@@ -18,9 +18,9 @@ bool SocketServer::setupSocketServer(const char *port) {
 	// Resolve the local address and port to be used by the server
 	iResult = getaddrinfo(NULL, port, &hints, &result);
 	if (iResult != 0) {
-	    printf("getaddrinfo failed: %d\n", iResult);
-	    WSACleanup();
-	    return false;
+		printf("getaddrinfo failed: %d\n", iResult);
+		WSACleanup();
+		return false;
 	}
 	// setup socket
 	listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
@@ -102,6 +102,7 @@ void SocketServer::failedRead() {
 
 // public 
 SocketServer::SocketServer(const char *port) : CommConnection() {
+	printf("Socket Server setting up!\n");
 	if(!setupSocketServer(port)) {
 		printf("Could not setup socket server. Check parameters.\n");
 	}
