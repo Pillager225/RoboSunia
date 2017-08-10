@@ -36,7 +36,6 @@ void SerialPort::exitGracefully() {
 
 // public:
 SerialPort::SerialPort() : CommConnection() {
-	printf("Creating SerailPort\n");
 	char portPrefix[] =  "\\\\.\\COM0";
 	printf("Searching for arduino...\n");
 	for (int i = 2; i < 10; i++) {

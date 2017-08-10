@@ -19,8 +19,8 @@ static void signalHandler(int signum) {
 }
 
 int main() {
-//	signal(SIGTERM, signalHandler);
-//	signal(SIGINT,  signalHandler);
+	signal(SIGTERM, signalHandler);
+	signal(SIGINT,  signalHandler);
 	sockData = new char[MAX_DATA_LENGTH];
 	serData = new char[MAX_DATA_LENGTH];
 	while (!ser.isConnected() && !sock.isConnected());

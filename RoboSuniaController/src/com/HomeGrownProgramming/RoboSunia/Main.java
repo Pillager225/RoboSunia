@@ -175,10 +175,6 @@ public class Main extends Thread {
 				String input = wt.read();
 				if(input.length() > 0) {
 					input = removePadding(input);
-					//System.out.println(input);
-					for(int i = 0; i < input.length(); i++) {
-						System.out.print((int)input.charAt(i) + " ");
-					}
 					distanceLabel.setText("Sensed Distance: " + input);
 				}
 				Thread.sleep(100);

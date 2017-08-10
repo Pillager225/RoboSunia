@@ -102,7 +102,6 @@ void SocketServer::failedRead() {
 
 // public 
 SocketServer::SocketServer(const char *port) : CommConnection() {
-	printf("Socket Server setting up!\n");
 	if(!setupSocketServer(port)) {
 		printf("Could not setup socket server. Check parameters.\n");
 	}
