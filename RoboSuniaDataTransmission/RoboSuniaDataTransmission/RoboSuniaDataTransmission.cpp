@@ -10,25 +10,27 @@ SocketServer sock(PORT);
 
 int main() {
 	char *sockData = new char[MAX_DATA_LENGTH], *serData = new char[MAX_DATA_LENGTH];
+	bool go = true;
 
 	while (!ser.isConnected() && !sock.isConnected());
 	ser.begin();
 	sock.begin();
 
-	while (true) {
+	while (go) {
 		if (sock.available() >= 4) {
 			int sockDataLength = sock.readUntil(sockData, MAX_DATA_LENGTH, '\r');
-			
-			printf("Socket: %d | ", sockDataLength);
+	/*		printf("Socket: %d | ", sockDataLength);
 			for (int i = 0; i < sockDataLength; i++) {
 				printf("%d ", sockData[i]);
 			}
-			printf("\n");
+			printf("\n"); */
 			if(sockDataLength == 4) {
 				sockData[sockDataLength] = '\0';
 				if (strcmp(sockData, "quit") == 0) {
 					printf("Quitting");
-					return 0;
+					sock.terminate();
+					ser.terminate();
+					go = false;
 				}
 				ser.write(sockData, 4);
 			}

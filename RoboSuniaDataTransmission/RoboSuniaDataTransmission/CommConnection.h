@@ -20,6 +20,7 @@ protected:
 
 	virtual void failedRead() = 0;
 	virtual int getData(char *buff, const int &buffSize) = 0;
+	virtual void exitGracefully() = 0;
 public:
 	CommConnection();
 	~CommConnection();
@@ -31,6 +32,7 @@ public:
 	int readUntil(char *buff, const int &buffSize, const char &delim);
 	bool isConnected() const;
 	void clearBuffer();	
+	void terminate();
 
 	virtual bool write(char *buff, const int &bufSize) = 0;
 };

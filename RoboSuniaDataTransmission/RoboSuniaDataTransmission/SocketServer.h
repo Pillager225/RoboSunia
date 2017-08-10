@@ -10,6 +10,9 @@
 #include <ws2tcpip.h>
 #include <cstdlib>
 #include <cstdio>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
 #include "CommConnection.h"
 
 // Need to link with Ws2_32.lib

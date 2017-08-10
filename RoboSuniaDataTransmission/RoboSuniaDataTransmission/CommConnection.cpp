@@ -14,7 +14,6 @@ void CommConnection::performReads() {
 	}
 }
 
-
 void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 	int newWriteIndex = bytesRead+writeIndex;
 	if(newWriteIndex < BUFFER_SIZE) {
@@ -38,12 +37,7 @@ CommConnection::CommConnection() {
 }
 
 CommConnection::~CommConnection() {
-	interruptRead = true;
-	if(readThread != NULL) {
-		readThread->join();
-		delete readThread;
-	}
-	delete[] buffer;	
+	terminate();	
 }
 
 bool CommConnection::begin() {
@@ -117,4 +111,14 @@ bool CommConnection::isConnected() const {
 
 void CommConnection::clearBuffer() {
 	readIndex = writeIndex;
+}
+
+void CommConnection::terminate() {
+	interruptRead = true;
+	if(readThread != NULL && readThread->joinable()) {
+		readThread->join();
+		delete readThread;
+	}
+	delete[] buffer;
+	exitGracefully();
 }

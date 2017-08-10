@@ -26,8 +26,16 @@ int SerialPort::getData(char *buff, const int &buffSize) {
 	return 0;
 }
 
+void SerialPort::exitGracefully() {
+	write("reset", 5);
+	if (connected) {
+		connected = false;
+		CloseHandle(handler);
+	}
+}
+
 // public:
-SerialPort::SerialPort() {
+SerialPort::SerialPort() : CommConnection() {
 	char portPrefix[] =  "\\\\.\\COM0";
 	printf("Searching for arduino...\n");
 	for (int i = 2; i < 10; i++) {
@@ -40,10 +48,11 @@ SerialPort::SerialPort() {
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
 		if (handler == INVALID_HANDLE_VALUE) {
-			if (GetLastError() == ERROR_FILE_NOT_FOUND) {
+			int error = GetLastError();
+			if (error == ERROR_FILE_NOT_FOUND) {
 				continue;
 			} else {
-				printf("Unknown error.");
+				printf("Unknown error.%d\n", error);
 			}
 		} else {
 			DCB dcbSerialParameters = { 0 };
@@ -112,11 +121,6 @@ SerialPort::SerialPort(char *portName) : CommConnection() {
 
 SerialPort::~SerialPort() {
 	CommConnection::~CommConnection();
-	write("reset", 5);
-	if (connected) {
-		connected = false;
-		CloseHandle(handler);
-	}
 }
 
 bool SerialPort::write(char *buff, const int &buffSize) {
