@@ -18,12 +18,18 @@ int main() {
 	while (true) {
 		if (sock.available() >= 4) {
 			int sockDataLength = sock.readUntil(sockData, MAX_DATA_LENGTH, '\r');
-			//printf("Socket: %d | ", sockDataLength);
-			//for (int i = 0; i < sockDataLength; i++) {
-			//	printf("%d ", sockData[i]);
-			//}
-			//printf("\n");
+			
+			printf("Socket: %d | ", sockDataLength);
+			for (int i = 0; i < sockDataLength; i++) {
+				printf("%d ", sockData[i]);
+			}
+			printf("\n");
 			if(sockDataLength == 4) {
+				sockData[sockDataLength] = '\0';
+				if (strcmp(sockData, "quit") == 0) {
+					printf("Quitting");
+					return 0;
+				}
 				ser.write(sockData, 4);
 			}
 		}

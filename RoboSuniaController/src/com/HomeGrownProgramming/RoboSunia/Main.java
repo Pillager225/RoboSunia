@@ -100,7 +100,7 @@ public class Main extends Thread {
 	public static void terminate() throws IOException {
 		// send terminating signal
 		if(wt != null && wt.connected) {
-//			wt.send("reset");
+			wt.send("quit");
 			wt.close();
 		}
 		go = false;
