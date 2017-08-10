@@ -5,17 +5,15 @@
 
 #define PORT "12345"
 
+SerialPort ser;
+SocketServer sock(PORT);
+
 int main() {
-	SerialPort ser;
-	SocketServer sock(PORT);
 	char *sockData = new char[MAX_DATA_LENGTH], *serData = new char[MAX_DATA_LENGTH];
 
-	while (!ser.isConnected());
+	while (!ser.isConnected() && !sock.isConnected());
 	ser.begin();
-	while (!sock.isConnected());
 	sock.begin();
-	ser.clearBuffer();
-	sock.clearBuffer();
 
 	while (true) {
 		if (sock.available() >= 4) {
