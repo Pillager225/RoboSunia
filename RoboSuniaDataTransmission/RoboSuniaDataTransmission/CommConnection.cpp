@@ -30,7 +30,6 @@ void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 }
 
 CommConnection::CommConnection() {
-	printf("Creating comm connection\n");
 	connected = false;
 	interruptRead = false;
 	buffer = new char[BUFFER_SIZE];

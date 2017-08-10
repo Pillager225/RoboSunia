@@ -52,6 +52,41 @@ bool SocketServer::setupSocketServer(const char *port) {
 	return waitForClientConnection();
 }
 
+bool SocketServer::acceptClient() {
+	clientSocket = accept(listenSocket, NULL, NULL);
+	if(clientSocket == INVALID_SOCKET) {
+		printf(" accept failed: %d\n", WSAGetLastError());
+		closesocket(listenSocket);
+		WSACleanup();
+		return false;
+	} else {
+		printf(" Controller client connected!\n");
+		connected = true;
+		return true;
+	}
+}
+
+bool SocketServer::acceptClientWrapper() {
+	std::mutex m;
+	std::condition_variable cv;
+	bool retval;
+	std::thread t([&m, &cv, &retval, this]()
+	{
+		retval = acceptClient();
+		cv.notify_one();
+	});
+
+	t.detach();
+
+	{
+		std::unique_lock<std::mutex> l(m);
+		if (cv.wait_for(l, std::chrono::seconds(1)) == std::cv_status::timeout)
+			throw std::runtime_error("Timeout");
+	}
+
+	return retval;
+}
+
 bool SocketServer::waitForClientConnection() {
 	// setup listening on socket for connections
     if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
@@ -60,29 +95,37 @@ bool SocketServer::waitForClientConnection() {
 	    WSACleanup();
 	    return false;
 	}
-	printf("Waiting for controller client connection...\n");
-	// accept a client socket
-	clientSocket = accept(listenSocket, NULL, NULL);
-	if (clientSocket == INVALID_SOCKET) {
-	    printf("accept failed: %d\n", WSAGetLastError());
-	    closesocket(listenSocket);
-	    WSACleanup();
-	    return false;
-	} else {
-		printf("Controller client connected!\n");
-		connected = true;
-		return true;
+	printf("Waiting for controller client connection");
+	try {
+		return acceptClientWrapper();
+	} catch (const std::runtime_error &e) {
+		while (!interruptRead && !connected) {
+			printf(".");
+			Sleep(1000);
+		}
+		if(interruptRead && !connected) {
+			return false;
+		} else if(!interruptRead && connected) {
+			return true;
+		}
 	}
 }
 
 void SocketServer::exitGracefully() {
+	bool safeToClose = true;
 	// shutdown the send half of the connection since no more data will be sent
 	int iResult = shutdown(clientSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
-	    printf("shutdown failed: %d\n", WSAGetLastError());
+		int error = WSAGetLastError();
+		if (error != WSAENOTSOCK) {
+			printf("shutdown failed: %d\n", error);
+		}
+		safeToClose = false;
 	}
 	// cleanup
-	closesocket(clientSocket);
+	if (safeToClose) {
+		closesocket(clientSocket);
+	}
 	closesocket(listenSocket);
 	WSACleanup();
 }
