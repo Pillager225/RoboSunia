@@ -90,8 +90,7 @@ void SocketServer::exitGracefully() {
 int SocketServer::getData(char *buff, const int &buffSize) {
 	if(connected)
 		return recv(clientSocket, buff, buffSize, 0);
-	else 
-		return -1;
+	return -1;
 }
 
 void SocketServer::failedRead() {

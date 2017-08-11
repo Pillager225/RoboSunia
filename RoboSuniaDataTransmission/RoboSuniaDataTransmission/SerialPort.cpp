@@ -6,6 +6,8 @@ void SerialPort::failedRead() {
 }
 
 int SerialPort::getData(char *buff, const int &buffSize) {
+	if(!connected)
+		return -1; 
 	DWORD toRead, bytesRead, errors;
 	COMSTAT status;
 	ClearCommError(handler, &errors, &status);
@@ -120,7 +122,7 @@ SerialPort::SerialPort(char *portName) : CommConnection() {
 }
 
 SerialPort::~SerialPort() {
-	CommConnection::~CommConnection();
+	exitGracefully();	
 }
 
 bool SerialPort::write(char *buff, const int &buffSize) {
