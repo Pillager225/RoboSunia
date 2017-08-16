@@ -29,11 +29,15 @@ int SerialPort::getData(char *buff, const int &buffSize) {
 }
 
 void SerialPort::exitGracefully() {
+	char *stop = new char[4];
+	memset(stop, 0, 4);
+	write(stop, 4);
 	write("reset", 5);
 	if (connected) {
 		connected = false;
 		CloseHandle(handler);
 	}
+	delete[] stop;
 }
 
 // public:
