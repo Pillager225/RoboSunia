@@ -1,55 +1,27 @@
-int encoderPins[] = {4, 5};
-int blipsPerRotation = 40;
-const int sampleSize = 10;
-long lastBlipTime[2];
-long blipDiff[2][sampleSize];
-int blipIndex[2];
-int blipCount[2];
-const int dWeight = 5;
+// inches
+#define WHEEL_DIAMETER 5
+#define BLIPS_PER_ROTATION 40
+#define SAMPLE_SIZE 10
+#define VEL_DEADZONE .1
+#define VEL_ERROR_THRESHOLD 2
 
-void encoderISR(int i) {
-  long now = millis();
-  blipDiff[i][blipIndex[i]] = now-lastBlipTime[i];
-  lastBlipTime[i] = now;
-  blipIndex[i] = blipIndex[i]+1 == sampleSize ? 0 : blipIndex[i]+1;
-  blipCount[i]++;
-}
-
-void lEncoderISR() {
-  encoderISR(0);
-}
-
-void rEncoderISR() {
-  encoderISR(1);
-}
-
-double getAngularSpeed(int motor) {
-  long blipDiffAve = 0;
-  for(int i = 0; i < sampleSize; i++) {
-    blipDiffAve += blipDiff[motor][i];
-  }
-  blipDiffAve /= sampleSize;
-  // 5 inch wheels in diameter/4 because there are 40 state changes caused by the encoder in one rotation
-  // (2*pi*r/(blipsPerRotation/sampleSize))/blipDiffAve
-  return (31.4159265358979*sampleSize)/(blipsPerRotation*blipDiffAve);
-}
+const int dWeight = 5, encoderPins[] = {4, 5};
+double desiredAngularSpeed[] = {0, 0};
+Encoder encoders[2];
 
 void setupEncoders() {
-  for(int i = 0; i < 2; i++) {
-    pinMode(encoderPins[i], INPUT);
-  }
-  attachInterrupt(digitalPinToInterrupt(encoderPins[0]), lEncoderISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(encoderPins[1]), rEncoderISR, CHANGE);
+  encoders[LEFT] = Encoder(encoderPins[LEFT], BLIPS_PER_ROTATION, SAMPLE_SIZE, WHEEL_DIAMETER);
+  encoders[RIGHT] = Encoder(encoderPins[RIGHT], BLIPS_PER_ROTATION, SAMPLE_SIZE, WHEEL_DIAMETER);
 }
 
 void controlPWMs() {
   for(int i = 0; i < 2; i++) {
-    if(desiredAngularSpeed[i] >= .5) {
+    if(desiredAngularSpeed[i] <= VEL_DEADZONE) {
       curPWMs[i] = 0;
       analogWrite(pwmPins[i], curPWMs[i]);
     } else {
-      double speedDiff = getAngularSpeed(i)-desiredAngularSpeed[i];
-      if(doubleAbs(speedDiff) >= 2) {
+      double speedDiff = desiredAngularSpeed[i]-encoders[i].getSpeed();
+      if(doubleAbs(speedDiff) >= VEL_ERROR_THRESHOLD) {
         curPWMs[i] += speedDiff*dWeight;
         analogWrite(pwmPins[i], curPWMs[i]);
       }
