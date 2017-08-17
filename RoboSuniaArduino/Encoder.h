@@ -4,11 +4,11 @@
 #include "Arduino.h"
 
 class Encoder {
-protected:
-	int pin, blipsPerRotation = 40, aveSize = 10;
+//protected:
+	int pin, blipsPerRotation, aveSize;
 	double wheelCircumference, coeff;
-	volatile int blipIndex = 0;
-	volatile long blipDiffs[aveSize], lastBlipTime = 0;
+	volatile int blipIndex;
+	volatile long blipDiffs[aveSize], lastBlipTime;
 	volatile bool invalid = true;
 
 	void isr();
@@ -17,7 +17,7 @@ public:
 	Encoder(const int &pin, const int &blipsPerRotation, const int &sizeOfAverageWindow, const double &wheelDiameter);
 	double getSpeed() const;
 	bool isValid() const;
-	void clear();
+	void clearBuff();
 };
 
 #endif

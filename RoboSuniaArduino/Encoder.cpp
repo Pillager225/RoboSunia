@@ -20,11 +20,13 @@ void Encoder::isr() {
 }
 
 Encoder::Encoder(const int &pin, const int &blipsPerRotation, const int &sizeOfAverageWindow, const double &wheelDiameter) {
-	pin = pin;
-	blipsPerRotation = blipsPerRotation;
+	this->pin = pin;
+	this->blipsPerRotation = blipsPerRotation;
 	aveSize = sizeOfAverageWindow;
 	wheelCircumference = wheelDiameter*PI;
 	coeff = blipsToSpeedCoeff(aveSize);
+  lastBlipTime = 0;
+  blipIndex = 0;
 	pinMode(pin, INPUT);
 	attachInterrupt(digitalPinToInterrupt(pin), isr, CHANGE);
 	for(int i = 0; i < aveSize; i++) {
@@ -56,7 +58,7 @@ bool Encoder::isValid() const {
 }
 
 // should be called whenever stopping, starting or switching directions
-float Encoder::clear() {
+void Encoder::clearBuff() {
 	blipIndex = 0;
 	invalid = true;
 }
