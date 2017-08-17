@@ -1,15 +1,13 @@
 #include "DistanceSensor.h"
 
-#define DEFAULT_SIZE 10
-
 int DistanceSensor::findDistanceFromAnalogVal(const int &val) const {
 	if(!valid) 
 		return 0;
-	int dist = 0;
+	int dist = 0, i = 0;
 	if(val >= voltVals[0]) {
 		return -1;
 	}
-	for(int i = 1; i < numOfValues; i++) {
+	for(i = 1; i < numOfValues; i++) {
 		if(val == voltVals[i-1]) {
 			return dists[i-1];
 		}  else if(val == voltVals[i]) {
@@ -37,7 +35,7 @@ DistanceSensor::DistanceSensor() {
 	valid = false;
 }
 
-DistanceSensor::DistanceSensor(const int &pin, const int &numOfValues, int *voltVals, int *dists, const int &numOfReadings=DEFAULT_SIZE, const int &sampleSize=DEFAULT_SIZE) {
+DistanceSensor::DistanceSensor(const int &pin, const int &numOfValues, int *voltVals, int *dists, const int &numOfReadings, const int &sampleSize) {
 	this->pin = pin;
 	this->sampleSize = sampleSize;
 	this->numOfValues = numOfValues;
@@ -72,15 +70,15 @@ int DistanceSensor::getDistanceReading() {
 }
 
 String DistanceSensor::interperateDistanceReadings() const {
-	int prevIndex = readingIndex-1 < 0 ? numOfReadings-1 : readingIndex[sensor]-1;
+	int prevIndex = readingIndex-1 < 0 ? numOfReadings-1 : readingIndex-1;
 	int prevprevIndex = prevIndex-1 < 0 ? numOfReadings-1 : prevIndex-1;
 	if((distanceReadings[prevprevIndex] > 2 && distanceReadings[prevprevIndex] < 7)
 	  && distanceReadings[prevIndex] < distanceReadings[prevprevIndex] 
 	  && distanceReadings[readingIndex] > distanceReadings[prevprevIndex]+2) {
 		return String("Possibly too close");
 	}
-	if(distanceReadings[sensor][readingIndex[sensor]] == 0) {
+	if(distanceReadings[readingIndex] == 0) {
 		return String("31+ inches");
 	}
-	return String(distanceReadings[sensor][readingIndex[sensor]])+ " inches";
+	return String(distanceReadings[readingIndex])+ " inches";
 }

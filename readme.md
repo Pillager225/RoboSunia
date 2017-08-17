@@ -1,3 +1,3 @@
 Code for a robot that I made for Stanford University. The robot allowed for a remote employee to drive around the office and interact with employees who are on campus.
 
-Remember to make a directory link to Lib in the Arduino libraries folder! That can be found for the local user at a path like C:\User\RoboSunia\Documents\Arduino\libraries, but could also be installed in the root Arduino libraries folder (check Program Files x86). I say make a directory link so that the git updates automatically are applied to Arduino library without manually copying them.
+Remember to make a directory link to RoboSuniaLib in the Arduino libraries folder! That can be found for the local user at a path like C:\User\RoboSunia\Documents\Arduino\libraries, but could also be installed in the root Arduino libraries folder (check Program Files x86). I say make a directory link so that the git updates automatically are applied to Arduino library without manually copying them.

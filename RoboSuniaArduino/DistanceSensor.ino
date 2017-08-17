@@ -10,7 +10,7 @@ long lasttimeDist = 0;
 
 
 void setupDistanceSensor() {
-  dSenses[FRONT_SENSOR] = DistanceSensor(inputPins, numOfValues, voltVals, dists);
+  dSenses[FRONT_SENSOR] = DistanceSensor(inputPins[FRONT_SENSOR], numOfValues, &voltVals[0], &dists[0]);
 }
 
 String padOutput(String o, int dLen) {
