@@ -11,17 +11,10 @@ int getInput(char *buff) {
    }
 }
 
-//int waitForInput(char *buff) {
-//   int avail;
-//   while((avail = Serial.available()) <= 0);  
-//   for(int i = 0; i < avail; i++) {
-//     buff[i] = Serial.read();
-//   }
-//   buff[avail] = '\0'; 
-//   return avail;
-//}
-
 void waitForSerialConnection() {
+  // stop the motors if they are going
+  char d[] = {0,0};
+  setPWMs(d);
   while(!Serial);
   while(true) {
     delay(1000);

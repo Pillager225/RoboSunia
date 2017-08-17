@@ -1,4 +1,5 @@
 #include <Encoder.h>
+#include <DistanceSensor.h>
 #define MAX_BUFF_SIZE 64
 #define LEFT 0
 #define RIGHT 1
@@ -15,5 +16,5 @@ void setup() {
 
 void loop() {
   handleSerialInput();
-  handleDistSensors();
+  handleDistanceSensors();
 }

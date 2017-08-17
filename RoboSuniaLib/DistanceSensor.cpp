@@ -47,6 +47,7 @@ DistanceSensor::DistanceSensor(const int &pin, const int &numOfValues, int *volt
 	this->numOfReadings = numOfReadings;
 	distanceReadings = new int[numOfReadings];
 	valid = true;
+	pinMode(pin, INPUT);
 }
 
 DistanceSensor::~DistanceSensor() {
