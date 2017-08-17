@@ -1,37 +1,41 @@
-#include "Arduino.h"
+#include <Arduino.h>
+#include <stdlib.h>
 #include "Encoder.h"
-
-#define PI 3.14159265359
 
 double Encoder::blipsToSpeedCoeff(const int &averageLength) const {
 	// (wheelCircumference*(aveLen/blipsPerRotation))/(ave/aveLen)
 	return wheelCircumference*averageLength*averageLength/blipsPerRotation;
 }
 
-void Encoder::isr() {
-	long now = millis();
-	blipDiffs[blipIndex] = now-lastBlipTime;
-	lastBlipTime = now;
-	blipIndex++;
-	if(blipIndex == aveSize) {
-		blipIndex = 0;
-		invalids = false;
-	}
+Encoder::Encoder() {
+	pin = 0;
+	blipsPerRotation = 0;
+	aveSize = 0;
+	blipDiffs = NULL;
+	wheelCircumference = 0;
+	coeff = 0;
+	lastBlipTime = 0;
+	blipIndex = 0;
 }
 
 Encoder::Encoder(const int &pin, const int &blipsPerRotation, const int &sizeOfAverageWindow, const double &wheelDiameter) {
 	this->pin = pin;
 	this->blipsPerRotation = blipsPerRotation;
 	aveSize = sizeOfAverageWindow;
+	blipDiffs = new long[aveSize];
 	wheelCircumference = wheelDiameter*PI;
 	coeff = blipsToSpeedCoeff(aveSize);
-  lastBlipTime = 0;
-  blipIndex = 0;
+	lastBlipTime = 0;
+	blipIndex = 0;
 	pinMode(pin, INPUT);
-	attachInterrupt(digitalPinToInterrupt(pin), isr, CHANGE);
-	for(int i = 0; i < aveSize; i++) {
-		blipDiffs[i] = 0;
-	}
+	memset((void *)blipDiffs, 0, aveSize*sizeof(long));
+	// for(int i = 0; i < aveSize; i++) {
+	// 	blipDiffs[i] = 0;
+	// }
+}
+
+Encoder::~Encoder() {
+	delete[] blipDiffs;
 }
 
 double Encoder::getSpeed() const {
@@ -39,7 +43,7 @@ double Encoder::getSpeed() const {
 	// one should probably check if the speed is valid before asking for it
 	// but if one doesn't this slower speed calculation is done
 	// probably is inaccurate if accelerating
-	if(invalids) {
+	if(invalid) {
 		for(int i = blipIndex; i >= 0; i--) {
 			ave += blipDiffs[i];
 		}
@@ -61,4 +65,15 @@ bool Encoder::isValid() const {
 void Encoder::clearBuff() {
 	blipIndex = 0;
 	invalid = true;
+}
+
+void Encoder::isr() {
+	long now = millis();
+	blipDiffs[blipIndex] = now-lastBlipTime;
+	lastBlipTime = now;
+	blipIndex++;
+	if(blipIndex == aveSize) {
+		blipIndex = 0;
+		invalid = false;
+	}
 }

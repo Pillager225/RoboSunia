@@ -1,3 +1,4 @@
+#include <Encoder.h>
 #define MAX_BUFF_SIZE 64
 #define LEFT 0
 #define RIGHT 1
