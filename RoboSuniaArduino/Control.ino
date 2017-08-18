@@ -1,5 +1,5 @@
 int dirPins[] = {7, 8};
-int pwmPins[] = {10, 11};
+int pwmPins[] = {3, 5};
 char curDirs[] = {0, 0};
 char curPWMs[] = {0, 0};
 
