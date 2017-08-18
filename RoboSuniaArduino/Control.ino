@@ -37,19 +37,33 @@ void handleSerialInput() {
 }
 
 void setupControlPins() {
-  for(int i = 0; i < 2; i++) {
-    pinMode(dirPins[i], OUTPUT);
-    pinMode(pwmPins[i], OUTPUT);
-  } 
+  DDRE |= 01000000; // setup pin 7 as output
+  DDRB |= 11010000; // setup pin 11, 10, and 8 as output
+//  for(int i = 0; i < 2; i++) {
+//    pinMode(dirPins[i], OUTPUT);
+//    pinMode(pwmPins[i], OUTPUT);
+//  } 
 }
 
 // dirs should have two indicies
 // dirs[i] should correspond to dirPins[i]
 void setDirections(char *dirs) {
+  
   for(int i = 0; i < 2; i++) {
     if(dirs[i] != curDirs[i]) {
       curDirs[i] = dirs[i];
-      digitalWrite(dirPins[i], dirs[i]);
+      if(i == 0) {
+        if(dirs[i]) 
+          PORTE |= 01000000;
+        else 
+          PORTE &= 10111111;
+      } else {
+        if(dirs[i])
+          PORTB |= 00010000;
+        else
+          PORTB &= 11101111;
+      }
+      //digitalWrite(dirPins[i], dirs[i]);
     }
   }
 }
