@@ -1,3 +1,4 @@
+#define NUM_WHEELS 2 
 int dirPins[] = {7, 8};
 int pwmPins[] = {3, 5};
 char curDirs[] = {0, 0};
@@ -6,47 +7,22 @@ char curPWMs[] = {0, 0};
 double desiredAngularSpeed[] = {0, 0};
 double maxAngularSpeed = 100;
 
-unsigned long lasttime = 0;
-
-void handleSerialInput() {
-  int len = getInput(input);
-  if(len > 0) {
-    if(len == 4) {
-      // interpet the input as commands for the motors
-      char dirs[2], pwms[2];
-      memcpy(dirs, &input[0], 2);
-      memcpy(pwms, &input[2], 2);
-      setDirections(dirs);
-      setPWMs(pwms);
-      lasttime = millis();
-    } else if(strcmp(input, "reset") == 0) {
-      waitForSerialConnection();
-    }
-  } else {
-    if(lasttime > millis()) {
-      // millis() overflowed because the arduino has been running for more than 50 days
-      lasttime = millis();
-    } else if(millis()-lasttime >= 500) {
-      // haven't recieved communication from main processor (Cherry Trail) in half of a second
-      // this might be caused by some network error so
-      // stop to robot from moving so that it doesn't crash
-      char d[] = {0,0};
-      setPWMs(d);
-    }
-  }
-}
-
 void setupControlPins() {
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < NUM_WHEELS; i++) {
     pinMode(dirPins[i], OUTPUT);
     pinMode(pwmPins[i], OUTPUT);
   } 
 }
 
+void stopWheels() {
+  char d[] = {0,0};
+  setPWMs(d);
+}
+
 // dirs should have two indicies
 // dirs[i] should correspond to dirPins[i]
 void setDirections(char *dirs) {
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < NUM_WHEELS; i++) {
     if(dirs[i] != curDirs[i]) {
       curDirs[i] = dirs[i];
       digitalWrite(dirPins[i], dirs[i]);
@@ -60,7 +36,7 @@ void setDirections(char *dirs) {
 // valuse from 0-255 and there is no reason to waste extra memory
 // by using ints
 void setPWMs(char *pwms) {
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < NUM_WHEELS; i++) {
     if(pwms[i] != curPWMs[i]) {
       curPWMs[i] = pwms[i];
       analogWrite(pwmPins[i], pwms[i]);
