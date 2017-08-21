@@ -1,8 +1,4 @@
 // The distance sensor communication in handled in Distance Sensor, mostly because this file is so long already
-
-// in milliseconds
-#define COMM_TIMEOUT 500
-#define COMMAND_PACKET_LENGTH 6
 unsigned long lasttime = 0;
 char input[MAX_BUFF_SIZE];
 

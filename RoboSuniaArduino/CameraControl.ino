@@ -1,7 +1,3 @@
-// in degrees
-#define MOVING_SPEED 3
-#define NUM_CAMERA_SERVOS 2
-
 int servoPins[] = {9, 10}, servoAngles[] = {90, 90};
 Servo servos[NUM_CAMERA_SERVOS];
 

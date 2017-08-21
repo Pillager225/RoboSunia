@@ -9,6 +9,8 @@
 // LOOP_PERIOD is in seconds
 #define LOOP_PERIOD .05
 #define PORT "12345"
+#define COMM_PACKET_LENGTH 6
+#define SERIAL_RESPONSE_LENGTH 32
 
 SerialPort ser;
 SocketServer sock(PORT);
@@ -24,15 +26,15 @@ void transmissionLoop() {
 		printf("%d ", sockData[i]);
 		}
 		printf("\n"); */
-		if (sockDataLength == 4) {
+		if (sockDataLength == COMM_PACKET_LENGTH) {
 			sockData[sockDataLength] = '\0';
 			if (strcmp(sockData, "quit") == 0) {
 				go = false;
 			}
-			ser.write(sockData, 4);
+			ser.write(sockData, COMM_PACKET_LENGTH);
 		}
 	}
-	if (ser.available() > 32) {
+	if (ser.available() > SERIAL_RESPONSE_LENGTH) {
 		int serDataLength = ser.readUntil(serData, MAX_DATA_LENGTH, '\r');
 		//printf("Serial: %d | ", serDataLength);
 		//for (int i = 0; i < serDataLength; i++) {

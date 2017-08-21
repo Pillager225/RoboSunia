@@ -3,10 +3,15 @@
 
 #include <Arduino.h>
 
+#define VEL_DEADZONE .1
+#define VEL_ERROR_THRESHOLD 2
+// for proportional control of the motors
+#define Kp 5
+
 class Encoder {
 protected:
 	int pin, blipsPerRotation, aveSize;
-	double wheelCircumference, coeff;
+	double wheelCircumference, coeff, desiredSpeed;
 	volatile int blipIndex;
 	volatile long *blipDiffs, lastBlipTime;
 	volatile bool invalid = true;
@@ -21,6 +26,8 @@ public:
 	bool isValid() const;
 	void clearBuff();
 	void isr();
+	void setDesiredSpeed(const double &speed);
+	int getSpeedControlEffort();
 };
 
 #endif

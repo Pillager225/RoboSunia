@@ -1,10 +1,3 @@
-#define NUM_SENSORS 1
-#define FRONT_SENSOR 0
-// in milliseconds
-#define SENSOR_READING_PERIOD 300
-#define MESSAGE_LENGTH 32
-#define NUM_VALUES 11
-
 DistanceSensor dSenses[NUM_SENSORS];
 int inputPins[] = {A5};
 int voltVals[NUM_VALUES] = {603, 452, 264, 188, 150, 127, 108, 96, 85, 77, 70}; // analogRead vals

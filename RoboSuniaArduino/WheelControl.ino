@@ -1,4 +1,3 @@
-#define NUM_WHEELS 2 
 int dirPins[] = {7, 8};
 int pwmPins[] = {3, 5};
 char curDirs[] = {0, 0};
@@ -33,7 +32,7 @@ void setDirections(char *dirs) {
 // pwms should have two indicies
 // pwms[i] should correspond to pwmPins[i]
 // pwms is a char * because analogWrite() only accepts pwm values
-// valuse from 0-255 and there is no reason to waste extra memory
+// values from 0-255 and there is no reason to waste extra memory
 // by using ints
 void setPWMs(char *pwms) {
   for(int i = 0; i < NUM_WHEELS; i++) {
@@ -44,3 +43,11 @@ void setPWMs(char *pwms) {
     }
   }
 }
+
+void addToPWM(int val, int motor) {
+  curPWMs[motor] += val;
+  curPWMs[motor] = curPWMs[motor] > 255 ? 255 : curPWMs[motor];
+  curPWMs[motor] = curPWMs[motor] < 0 ? 0 : curPWMs[motor];
+  analogWrite(pwmPins[motor], curPWMs[motor]);
+}
+

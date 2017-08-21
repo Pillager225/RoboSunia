@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <stdlib.h>
+#include <math.h>
 #include "Encoder.h"
 
 double Encoder::blipsToSpeedCoeff(const int &averageLength) const {
@@ -16,6 +17,7 @@ Encoder::Encoder() {
 	coeff = 0;
 	lastBlipTime = 0;
 	blipIndex = 0;
+	desiredSpeed = 0;
 }
 
 Encoder::Encoder(const int &pin, const int &blipsPerRotation, const int &sizeOfAverageWindow, const double &wheelDiameter) {
@@ -27,6 +29,7 @@ Encoder::Encoder(const int &pin, const int &blipsPerRotation, const int &sizeOfA
 	coeff = blipsToSpeedCoeff(aveSize);
 	lastBlipTime = 0;
 	blipIndex = 0;
+	desiredSpeed = 0;
 	pinMode(pin, INPUT);
 	memset((void *)blipDiffs, 0, aveSize*sizeof(long));
 	// for(int i = 0; i < aveSize; i++) {
@@ -76,4 +79,20 @@ void Encoder::isr() {
 		blipIndex = 0;
 		invalid = false;
 	}
+}
+
+void Encoder::setDesiredSpeed(const double &speed) {
+	desiredSpeed = speed;
+}
+
+// returns the pwm value to be added to the current pwm for the motors
+int Encoder::getSpeedControlEffort() {
+	if(desiredSpeed < VEL_DEADZONE) {
+		return 0;
+	}
+	double speedDiff = desiredSpeed-getSpeed();
+	if(fabs(speedDiff) >= VEL_ERROR_THRESHOLD) {
+		return speedDiff*Kp;
+	}
+	return 0;
 }
