@@ -117,8 +117,7 @@ public class Main extends Thread {
 		return s.substring(0, i+1);
 	}
 	
-	// This will turn the boolean values about the motor states stored in ka into a string.
-	private char[] getMotorStates() {
+	private void motorLogic() {
 		if(ka.forwardPressed) {
 			if(ka.leftPressed) {
 				ka.lmState = 0;
@@ -148,7 +147,12 @@ public class Main extends Thread {
 			ka.lmState = 1;
 			ka.rmState = -1;
 		}
-		char[] b = new char[5];
+	}
+	
+	// This will turn the boolean values about the motor states stored in ka into a string.
+	private char[] getControlPacket() {
+		motorLogic();
+		char[] b = new char[7];
 		b[0] = (char) (ka.lmState == -1 ? 1 : 0);
 		b[1] = (char) (ka.rmState == -1 ? 1 : 0);
 		if(ka.lmState != 0) {
@@ -163,7 +167,22 @@ public class Main extends Thread {
 		}
 		b[2] = (char) lmPWM;
 		b[3] = (char) rmPWM;
-		b[4] = 13;
+		
+		if(ka.camUpPressed) {
+			b[4] = '2';
+		} else if(ka.camDownPressed) {
+			b[4] = '0';
+		} else {
+			b[4] = '1';
+		}
+		if(ka.camRightPressed) {
+			b[5] = '2';
+		} else if(ka.camRightPressed) {
+			b[5] = '0';
+		} else {
+			b[5] = '1';
+		}
+		b[6] = 13;
 		return b;
 	}
 	
@@ -171,7 +190,7 @@ public class Main extends Thread {
 	public void run() {
 		while(go) {
 			try {
-				wt.send(getMotorStates());
+				wt.send(getControlPacket());
 				String input = wt.read();
 				if(input.length() > 0) {
 					input = removePadding(input);
