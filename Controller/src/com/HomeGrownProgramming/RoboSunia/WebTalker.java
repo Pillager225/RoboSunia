@@ -11,8 +11,8 @@ public class WebTalker {
 //	String hostName = "171.66.76.46";   // actual
 //	String hostName = "171.64.20.35"; 	// Wired
 //	String hostName = "192.168.1.216";	// home
-//	String hostName = "10.21.163.151";
-	String hostName = "127.0.0.1";
+	String hostName = "10.35.123.92";
+//	String hostName = "127.0.0.1";
     int portNumber = 12345;
     Socket socket;
     PrintWriter out;

@@ -1,4 +1,4 @@
-const int dWeight = 5, encoderPins[] = {4, 5};
+const int dWeight = 5, encoderPins[] = {2, 4};
 Encoder encoders[2];
 
 void isrLeft() {
