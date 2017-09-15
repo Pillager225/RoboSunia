@@ -52,15 +52,19 @@ public class KeyAction implements KeyListener {
 				break;
 			case camUp:
 				camUpPressed = true;
+				camDownPressed = false;
 				break;
 			case camDown:
 				camDownPressed = true;
+				camUpPressed = false;
 				break;
 			case camLeft:
 				camLeftPressed = true;
+				camRightPressed = false;
 				break;
 			case camRight:
 				camRightPressed = true;
+				camLeftPressed = false;
 				break;
 		}
 	}

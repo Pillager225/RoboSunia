@@ -34,9 +34,19 @@ public class Main extends Thread {
 	private KeyAction ka;
 	private static boolean go = true; 
 	
-	public Main() {
+//	String hostName = "171.66.76.46";   // actual
+//	String hostName = "171.64.20.35"; 	// Wired
+//	String hostName = "192.168.1.216";	// home
+	static String hostName = "10.35.123.92";
+//	String hostName = "127.0.0.1";
+    static int portNumber = 12345;
+	static String helpText= "This program will try to connect to a robot named RoboSunia in Stanford to control it.\nUsage:\n\tjava -jar RoboSuniaController.jar [ipaddr] [port]\n\n"
+			+"ipaddr must be an IPv4 address to try to connect to and is optional as it will default to " + hostName + "\n"
+			+"port is the port this program will attempt to connect on and is optional as it will default to " + Integer.toString(portNumber) + "\n";
+	
+	public Main(String hostName, int portNumber) {
 		makeFrame();
-		wt = new WebTalker();
+		wt = new WebTalker(hostName, portNumber);
 	}
 	
 	class WindowListener extends WindowAdapter {
@@ -177,7 +187,7 @@ public class Main extends Thread {
 		}
 		if(ka.camRightPressed) {
 			b[5] = '2';
-		} else if(ka.camRightPressed) {
+		} else if(ka.camLeftPressed) {
 			b[5] = '0';
 		} else {
 			b[5] = '1';
@@ -204,6 +214,31 @@ public class Main extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new Main().start();
+	    if(args.length > 0) {
+	    	if(args[0].equals("/h") || args[0].equals("-h")) {
+	    		System.out.println(helpText);
+	    		System.exit(0);
+	    	}
+	    	if(args.length >= 1) {
+	    		if(args[0].matches("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")) {
+	    			hostName = args[0];
+	    		} else {
+	    			System.err.println("First argument does not look like an IPv4 address. Please try again.\n");
+	    			System.err.println(helpText);
+	    			System.exit(1);
+	    		}
+	    	}
+	    	if(args.length == 2) {
+	    		portNumber = Integer.parseInt(args[1]);
+	    		if(portNumber < 1 || portNumber > 65535) {
+	    			System.out.println("Second argument is out of the valid port range, or is not a number. Please try again.\n");
+	    			System.err.println(helpText);
+	    			System.exit(2);
+	    		}
+	    	}
+	    } else { 
+	    	System.out.println("Defaulting to connect to " + hostName + ":" + Integer.toString(portNumber));
+	    }
+		new Main(hostName, portNumber).start();
 	}
 }
