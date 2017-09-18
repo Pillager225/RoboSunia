@@ -23,12 +23,11 @@ public class Main extends Thread {
 	// 3rd byte is the PWM value for motor 1 (0-255)
 	// 4th byte is the PWM value for motor 2 (0-255)
 	
-	private static final int MAX_PWM = 255;
-	private static final int MIN_PWM = 40;
-	private int limitPWM = 100;
+	public static final int MAX_PWM = 255;
+	public static final int MIN_PWM = 40;
+	public static int limitPWM = 100;
 	private int lmPWM = 0, rmPWM = 0;
 	private int PWMInc = 30;
-	private JLabel distanceLabel;
 	
 	private static WebTalker wt = null;
 	private KeyAction ka;
@@ -43,9 +42,11 @@ public class Main extends Thread {
 	static String helpText= "This program will try to connect to a robot named RoboSunia in Stanford to control it.\nUsage:\n\tjava -jar RoboSuniaController.jar [ipaddr] [port]\n\n"
 			+"ipaddr must be an IPv4 address to try to connect to and is optional as it will default to " + hostName + "\n"
 			+"port is the port this program will attempt to connect on and is optional as it will default to " + Integer.toString(portNumber) + "\n";
+	public UI ui;
 	
 	public Main(String hostName, int portNumber) {
-		makeFrame();
+		ka = new KeyAction();
+		ui = new UI(ka);
 		wt = new WebTalker(hostName, portNumber);
 	}
 	
@@ -57,54 +58,6 @@ public class Main extends Thread {
 				e1.printStackTrace();
 			}
 		}
-	}
-	
-	private void makeFrame() {
-		JFrame frame = new JFrame("RoboSunia Control Window");
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(600,400);
-		frame.setLocation(10,30);
-		frame.addWindowListener(new WindowListener());
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-		JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, MIN_PWM, MAX_PWM, limitPWM);
-		speedSlider.setMajorTickSpacing(10);
-		speedSlider.setMinorTickSpacing(5);
-		speedSlider.setPaintTicks(true);
-		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put( new Integer( MIN_PWM ), new JLabel("Slow") );
-		labelTable.put( new Integer( 100 ), new JLabel("Good") );
-		labelTable.put( new Integer( 2*MAX_PWM/3 ), new JLabel("Fast") );
-		labelTable.put( new Integer( MAX_PWM ), new JLabel("Dangerous") );
-		speedSlider.setLabelTable( labelTable );
-		speedSlider.setPaintLabels(true);
-		Font font = new Font("Serif", Font.PLAIN, 15);
-		speedSlider.setFont(font);
-		speedSlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				JSlider source = (JSlider)e.getSource();
-		        if (!source.getValueIsAdjusting()) {
-		            limitPWM = (int)source.getValue();
-		        }   
-			}
-		});
-		JLabel sliderLabel = new JLabel("Speed Limit", JLabel.CENTER);
-		sliderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		speedSlider.setFocusable(false);
-		distanceLabel = new JLabel("Waiting for first reading", JLabel.CENTER);
-		distanceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		distanceLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-		ka = new KeyAction();
-		mainPanel.setFocusable(false);
-		frame.addKeyListener(ka);
-		mainPanel.add(sliderLabel);
-		mainPanel.add(speedSlider);
-		mainPanel.add(distanceLabel);
-		frame.add(mainPanel);
-		//frame.add(kaContainer);
-		//frame.pack();
-		frame.setVisible(true);
 	}
 	
 	public static void terminate() throws IOException {
@@ -204,7 +157,7 @@ public class Main extends Thread {
 				String input = wt.read();
 				if(input.length() > 0) {
 					input = removePadding(input);
-					distanceLabel.setText("Sensed Distance: " + input);
+					ui.distanceLabel.setText("Sensed Distance: " + input);
 				}
 				Thread.sleep(100);
 			} catch (InterruptedException | IOException e) {
