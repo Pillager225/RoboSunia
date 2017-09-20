@@ -1,6 +1,7 @@
 int VERTICLE = 0, HORIZONTAL = 1;
-int servoPins[] = {9, 10}, servoAngles[] = {45, 90}, angLowLimit[] = {25, 10}, angHighLimit[] = {80, 170};
-Servo servos[NUM_CAMERA_SERVOS];
+int servoCenter[] = {45, 90};
+int servoPins[] = {9, 10}, servoAngles[] = {servoCenter[0], servoCenter[1]}, angLowLimit[] = {25, 10}, angHighLimit[] = {80, 170};
+Servo servos[NUM_CAMERA_SERVOS]; 
 
 void setupCameraServos() {
   for(int i = 0; i < NUM_CAMERA_SERVOS; i++) {
@@ -22,7 +23,7 @@ void moveCameraServos(char *servoCommands) {
       servoAngles[i] = servoAngles[i] >= angLowLimit[i] ? servoAngles[i] : angLowLimit[i];
       servos[i].write(servoAngles[i]);
     } else if(servoCommands[i] == '3') {
-      servoAngles[i] = servoAngles[i];
+      servoAngles[i] = servoCenter[i];
       servos[i].write(servoAngles[i]);
     }
   }
