@@ -10,7 +10,7 @@
 #define LOOP_PERIOD .05
 #define PORT "12345"
 #define COMM_PACKET_LENGTH 6
-#define SERIAL_RESPONSE_LENGTH 32
+#define SERIAL_RESPONSE_LENGTH 16
 
 SerialPort ser;
 SocketServer sock(PORT);

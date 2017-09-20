@@ -20,7 +20,7 @@
 #define FRONT_SENSOR 0
 // in milliseconds
 #define SENSOR_READING_PERIOD 300
-#define MESSAGE_LENGTH 32
+#define MESSAGE_LENGTH 16
 #define NUM_VALUES 11
 
 // COMM

@@ -5,7 +5,7 @@
 #include <thread>
 #include <cstring>
 
-#define MAX_DATA_LENGTH 256
+#define MAX_DATA_LENGTH 32
 #define BUFFER_SIZE 4096
 
 class CommConnection {
