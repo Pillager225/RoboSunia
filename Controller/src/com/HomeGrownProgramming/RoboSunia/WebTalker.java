@@ -23,11 +23,11 @@ public class WebTalker {
 	        Logger.log("Web Talker started.", Main.debugLevel);
 		} catch (UnknownHostException e) {
             Logger.log("\nDon't know about host " + hostName, Main.debugLevel);
-            Logger.log(e.getStackTrace().toString(), Main.debugLevel);
+            Logger.log(e, Main.debugLevel);
             System.exit(Main.UNKNOWN_HOST);
         } catch (IOException e) {
         	Logger.log("\nCouldn't get I/O for the connection to " + hostName, Main.debugLevel);
-            Logger.log(e.getStackTrace().toString(), Main.debugLevel);
+            Logger.log(e, Main.debugLevel);
             System.exit(Main.CANT_REACH_HOST);
         } 
 	}

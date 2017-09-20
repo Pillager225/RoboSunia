@@ -29,7 +29,7 @@ public class UserInterface extends JFrame {
 				Logger.log("Exit button was pressed. Exiting.", Main.debugLevel);
 				Main.terminate();
 			} catch (IOException e1) {
-				Logger.log(e1.getStackTrace().toString(), Main.debugLevel);
+				Logger.log(e1, Main.debugLevel);
 			}
 		}
 	}
@@ -45,7 +45,7 @@ public class UserInterface extends JFrame {
 	private void setupWindow() {
 		setName("RoboSunia Control Window");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setSize(800,400);
+		setSize(500,300);
 		setLocation(10,30);
 		addWindowListener(new WindowListener());
 	}

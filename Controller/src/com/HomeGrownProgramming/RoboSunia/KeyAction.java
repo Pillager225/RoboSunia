@@ -23,7 +23,7 @@ public class KeyAction implements KeyListener {
 				try {
 					Main.terminate();
 				} catch (IOException e1) {
-					Logger.log(e1.getStackTrace().toString(), Main.debugLevel);
+					Logger.log(e1, Main.debugLevel);
 				}
 				break;
 			case lmFKey:

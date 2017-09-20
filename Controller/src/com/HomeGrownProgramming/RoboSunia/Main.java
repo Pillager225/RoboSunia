@@ -17,7 +17,7 @@ public class Main extends Thread {
 	public static final String ipRegex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
 	public static final String portRegex = "[0-9]+";
 	public static final String connectionRegex = ipRegex+":"+portRegex;
-	public static int debugLevel = 0;
+	public static int debugLevel = 1;
 	
 	public static int limitPWM = 100;
 	private int lmPWM = 0, rmPWM = 0;
@@ -32,9 +32,28 @@ public class Main extends Thread {
 	private static String hostName = "10.35.123.92";
 //	String hostName = "127.0.0.1";	
     private static int portNumber = 12345;
-	static String helpText= "This program will try to connect to a robot named RoboSunia in Stanford to control it.\nUsage:\n\tjava -jar RoboSuniaController.jar [ipaddr] [port]\n\n"
-			+"ipaddr must be an IPv4 address to try to connect to and is optional as it will default to " + hostName + "\n"
-			+"port is the port this program will attempt to connect on and is optional as it will default to " + Integer.toString(portNumber) + "\n";
+	static String helpText = "This program will try to connect to a robot named RoboSunia in Stanford to \n" + 
+				"control it.\nUsage:\n\tjava -jar RoboSuniaController.jar [/h] [/d debugLevel] [[ipaddr] [port] || [connection]]\n\n" +
+			
+				"Arguments:\n" +
+				"\t/h will show this help text\n\n" +
+				
+				"\t/d will turns on debugging messages to be shown or logged. The default\n" +
+				"\tdebugLevel is 1. debugLevel can be\n" +
+				"\t\t1 for printing to stdout the basic messages about function\n" +
+				"\t\t2 additonally prints all communication packets\n" +
+				"\t\t3 additionally logs basic messages to file\n" +
+				"\t\t4 additionally logs all communciation packtes\n\n" +
+				
+				"\tipaddr must be an IPv4 address to try to connect to and is optional as it will\n" + 
+				"\tdefault to " + hostName + "\n\n" +
+				
+				"\tport is the port this program will attempt to connect on and is optional as it\n" +
+				"\twill default to " + Integer.toString(portNumber) + "\n\n" +
+				
+				"\tconnection is the ipaddr and port put together with a colon in the middle\n" + 
+				"\t(ie. " + hostName + ":" + Integer.toString(portNumber) + ")\n\n";
+	
 	public UserInterface ui;
 	
 	public Main(String hostName, int portNumber) {
@@ -181,21 +200,22 @@ public class Main extends Thread {
 		return true;
 	}
 	
-	public static void main(String[] args) {
+	private static void checkArguments(String[] args) {
 		boolean gotIP = false, gotPort = false;
 		for(int i = 0; i < args.length; i++) {
-			if(args[i].equals("/h") || args[i].equals("-h")) {
+			if(args[i].equals("/h") || args[i].equals("-h")) { // help flag
 				argumentError(HELP_TEXT);
-			} else if(args[i].equals("/d") || args[i].equals("-d")) {
+			} else if(args[i].equals("/d") || args[i].equals("-d")) { // debug flag
 				if(i+1 < args.length) {
 					if(args[i+1].matches(portRegex)) {
 						debugLevel = Integer.parseInt(args[i+1]);
 						if(debugLevel > MAX_DEBUG_LEVEL) {
 							argumentError(INVALID_DEBUG);
 						}
+						i++;
 					}
 				}
-			} else if(args[i].matches(connectionRegex) && !gotIP && !gotPort) {
+			} else if(args[i].matches(connectionRegex) && !gotIP && !gotPort) { // Connection checking
 				String[] data = args[i].split(":");
 				if(data.length > 2 || !data[0].matches(ipRegex) || !isValidPort(data[1])) {
 					argumentError(INVALID_CONNECTION);
@@ -204,10 +224,10 @@ public class Main extends Thread {
 				portNumber = Integer.parseInt(data[1]);
 				gotIP = true;
 				gotPort = true;
-			} else if(args[i].matches(ipRegex) && !gotIP) {
+			} else if(args[i].matches(ipRegex) && !gotIP) { // IP Checking
     			hostName = args[0];
 				gotIP = true;
-			} else if(args[i].matches(portRegex) && gotIP && !gotPort) {
+			} else if(args[i].matches(portRegex) && gotIP && !gotPort) { // Port Checking
     			portNumber = Integer.parseInt(args[i]);
     			if(portNumber < 1 || portNumber > 65535) {
 	    			argumentError(INVALID_PORT);
@@ -216,6 +236,10 @@ public class Main extends Thread {
     			argumentError(UNEXPECTED);
     		}
 		}
+	}
+	
+	public static void main(String[] args) {
+		checkArguments(args);
 		Logger.log("Connecting to " + hostName + ":" + Integer.toString(portNumber), debugLevel);
 		new Main(hostName, portNumber).start();
 	}

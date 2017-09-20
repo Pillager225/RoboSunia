@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -37,6 +39,12 @@ public class Logger {
 		}
 	}
 	
+	public static void log(Exception e, int logLevel) {
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		log(sw.toString(), logLevel);
+	}
+	
 	private static void writeToFile(final String s) {
 		if(fileOpened = false) {
 			try {
@@ -63,4 +71,6 @@ public class Logger {
 			}
 		}.start();
 	}
+	
+	
 }
