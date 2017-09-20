@@ -56,7 +56,8 @@ public class UserInterface extends JFrame {
 		mainPanel.setFocusable(false);
 		mainPanel.add(getLabel("Speed Limit"));
 		mainPanel.add(getSpeedSlider());
-		mainPanel.add(getLabel("Waiting for first reading"));
+		distanceLabel = getLabel("Waiting for first reading");
+		mainPanel.add(distanceLabel);
 		mainPanel.add(getControlsLabels());
 		mainPanel.add(getRobotMovementControls());
 		return mainPanel;

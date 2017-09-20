@@ -1,4 +1,5 @@
-int servoPins[] = {9, 10}, servoAngles[] = {30, 90};
+int VERTICLE = 0, HORIZONTAL = 1;
+int servoPins[] = {9, 10}, servoAngles[] = {30, 90}, angLowLimit[] = {30, 10}, angHighLimit[] = {80, 170};
 Servo servos[NUM_CAMERA_SERVOS];
 
 void setupCameraServos() {
@@ -14,9 +15,11 @@ void moveCameraServos(char *servoCommands) {
     // 2 means positive movement
     if(servoCommands[i] == '2') {
       servoAngles[i] += MOVING_SPEED;
+      servoAngles[i] = servoAngles[i] <= angHighLimit[i] ? servoAngles[i] : angHighLimit[i];
       servos[i].write(servoAngles[i]);
     } else if(servoCommands[i] == '0') {
       servoAngles[i] -= MOVING_SPEED;
+      servoAngles[i] = servoAngles[i] >= angLowLimit[i] ? servoAngles[i] : angLowLimit[i];
       servos[i].write(servoAngles[i]);
     }
   }
