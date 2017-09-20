@@ -17,26 +17,29 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class UI extends JFrame {
+public class UserInterface extends JFrame {
 
+	private static final long serialVersionUID = 6335319339658237340L;
 	public JLabel distanceLabel;
 	private static final int numInvisibleButtons = 6;
 	
 	protected class WindowListener extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			try {
+				Logger.log("Exit button was pressed. Exiting.", Main.debugLevel);
 				Main.terminate();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				Logger.log(e1.getStackTrace().toString(), Main.debugLevel);
 			}
 		}
 	}
 	
-	public UI(KeyAction ka) {
+	public UserInterface(KeyAction ka) {
 		setupWindow();
 		addKeyListener(ka);
 		add(getMainPanel());
 		setVisible(true);
+		Logger.log("User Interface started.", Main.debugLevel);
 	}
 
 	private void setupWindow() {

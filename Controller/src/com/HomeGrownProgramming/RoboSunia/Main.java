@@ -1,19 +1,6 @@
 package com.HomeGrownProgramming.RoboSunia;
 
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.Hashtable;
-
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class Main extends Thread {
 	
@@ -25,39 +12,35 @@ public class Main extends Thread {
 	
 	public static final int MAX_PWM = 255;
 	public static final int MIN_PWM = 40;
+	public static final int MAX_DEBUG_LEVEL = 4;
+	public static final int REQUESTED_TERMINATION = 0, HELP_TEXT = 0, UNEXPECTED = 1, INVALID_DEBUG = 2, INVALID_CONNECTION = 3, INVALID_PORT = 4, UNKNOWN_HOST = 5, CANT_REACH_HOST = 6;
+	public static final String ipRegex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+	public static final String portRegex = "[0-9]+";
+	public static final String connectionRegex = ipRegex+":"+portRegex;
+	public static int debugLevel = 0;
+	
 	public static int limitPWM = 100;
 	private int lmPWM = 0, rmPWM = 0;
 	private int PWMInc = 30;
-	
+
 	private static WebTalker wt = null;
 	private KeyAction ka;
 	private static boolean go = true; 
-	
 //	String hostName = "171.66.76.46";   // actual
 //	String hostName = "171.64.20.35"; 	// Wired
 //	String hostName = "192.168.1.216";	// home
-	static String hostName = "10.35.123.92";
-//	String hostName = "127.0.0.1";
-    static int portNumber = 12345;
+	private static String hostName = "10.35.123.92";
+//	String hostName = "127.0.0.1";	
+    private static int portNumber = 12345;
 	static String helpText= "This program will try to connect to a robot named RoboSunia in Stanford to control it.\nUsage:\n\tjava -jar RoboSuniaController.jar [ipaddr] [port]\n\n"
 			+"ipaddr must be an IPv4 address to try to connect to and is optional as it will default to " + hostName + "\n"
 			+"port is the port this program will attempt to connect on and is optional as it will default to " + Integer.toString(portNumber) + "\n";
-	public UI ui;
+	public UserInterface ui;
 	
 	public Main(String hostName, int portNumber) {
 		ka = new KeyAction();
-		ui = new UI(ka);
+		ui = new UserInterface(ka);
 		wt = new WebTalker(hostName, portNumber);
-	}
-	
-	class WindowListener extends WindowAdapter {
-		public void windowClosing(WindowEvent e) {
-			try {
-				Main.terminate();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
 	}
 	
 	public static void terminate() throws IOException {
@@ -67,7 +50,6 @@ public class Main extends Thread {
 			wt.close();
 		}
 		go = false;
-		System.exit(0);
 	}
 	
 	private String removePadding(String s) {
@@ -161,37 +143,80 @@ public class Main extends Thread {
 				}
 				Thread.sleep(100);
 			} catch (InterruptedException | IOException e) {
-				e.printStackTrace();
+				Logger.log(e.getStackTrace().toString(), Main.debugLevel);
 			}
 		}
+		System.exit(REQUESTED_TERMINATION);
+	}
+	
+	private static void argumentError(int errorNum) {
+		switch(errorNum) {
+		case HELP_TEXT: // help text is all that is required
+			break;
+		case UNEXPECTED: 
+			Logger.log("Unexpected arguments.", debugLevel);
+			break;
+		case INVALID_DEBUG:
+			Logger.log("Debug level was invalid.", debugLevel);
+			break;
+		case INVALID_CONNECTION:
+			Logger.log("Connection string look invalid", debugLevel);
+			break;
+		case INVALID_PORT:
+	    	Logger.log("Port argument is out of the valid port range, or is not a number. Please try again.\n", debugLevel);
+	    	break;
+		}
+		Logger.log(helpText, debugLevel);
+		System.exit(errorNum);
+	}
+	
+	private static boolean isValidPort(String s) {
+		if(!s.matches(portRegex)) {
+			return false;
+		}
+		int num = Integer.parseInt(s);
+		if(num < 1 || num > 65535) {
+			return false;
+		}
+		return true;
 	}
 	
 	public static void main(String[] args) {
-	    if(args.length > 0) {
-	    	if(args[0].equals("/h") || args[0].equals("-h")) {
-	    		System.out.println(helpText);
-	    		System.exit(0);
-	    	}
-	    	if(args.length >= 1) {
-	    		if(args[0].matches("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")) {
-	    			hostName = args[0];
-	    		} else {
-	    			System.err.println("First argument does not look like an IPv4 address. Please try again.\n");
-	    			System.err.println(helpText);
-	    			System.exit(1);
+		boolean gotIP = false, gotPort = false;
+		for(int i = 0; i < args.length; i++) {
+			if(args[i].equals("/h") || args[i].equals("-h")) {
+				argumentError(HELP_TEXT);
+			} else if(args[i].equals("/d") || args[i].equals("-d")) {
+				if(i+1 < args.length) {
+					if(args[i+1].matches(portRegex)) {
+						debugLevel = Integer.parseInt(args[i+1]);
+						if(debugLevel > MAX_DEBUG_LEVEL) {
+							argumentError(INVALID_DEBUG);
+						}
+					}
+				}
+			} else if(args[i].matches(connectionRegex) && !gotIP && !gotPort) {
+				String[] data = args[i].split(":");
+				if(data.length > 2 || !data[0].matches(ipRegex) || !isValidPort(data[1])) {
+					argumentError(INVALID_CONNECTION);
+				}
+				hostName = data[0];
+				portNumber = Integer.parseInt(data[1]);
+				gotIP = true;
+				gotPort = true;
+			} else if(args[i].matches(ipRegex) && !gotIP) {
+    			hostName = args[0];
+				gotIP = true;
+			} else if(args[i].matches(portRegex) && gotIP && !gotPort) {
+    			portNumber = Integer.parseInt(args[i]);
+    			if(portNumber < 1 || portNumber > 65535) {
+	    			argumentError(INVALID_PORT);
 	    		}
-	    	}
-	    	if(args.length == 2) {
-	    		portNumber = Integer.parseInt(args[1]);
-	    		if(portNumber < 1 || portNumber > 65535) {
-	    			System.out.println("Second argument is out of the valid port range, or is not a number. Please try again.\n");
-	    			System.err.println(helpText);
-	    			System.exit(2);
-	    		}
-	    	}
-	    } else { 
-	    	System.out.println("Defaulting to connect to " + hostName + ":" + Integer.toString(portNumber));
-	    }
+    		} else {
+    			argumentError(UNEXPECTED);
+    		}
+		}
+		Logger.log("Connecting to " + hostName + ":" + Integer.toString(portNumber), debugLevel);
 		new Main(hostName, portNumber).start();
 	}
 }

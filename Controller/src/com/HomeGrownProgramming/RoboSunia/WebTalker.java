@@ -20,13 +20,15 @@ public class WebTalker {
 	        out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedInputStream(socket.getInputStream());
 			connected = true;
-	        System.out.println("Web Talker started.");
+	        Logger.log("Web Talker started.", Main.debugLevel);
 		} catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            System.exit(1);
+            Logger.log("\nDon't know about host " + hostName, Main.debugLevel);
+            Logger.log(e.getStackTrace().toString(), Main.debugLevel);
+            System.exit(Main.UNKNOWN_HOST);
         } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " + hostName);
-            System.exit(1);
+        	Logger.log("\nCouldn't get I/O for the connection to " + hostName, Main.debugLevel);
+            Logger.log(e.getStackTrace().toString(), Main.debugLevel);
+            System.exit(Main.CANT_REACH_HOST);
         } 
 	}
 	
@@ -42,7 +44,7 @@ public class WebTalker {
 	
 	public void send(String b) {
 		out.println(b);
-		System.out.println("Sending " + b);
+		Logger.log("Sending " + b, Main.debugLevel-1);
 	}
 	
 	public String read() throws IOException {
@@ -52,6 +54,7 @@ public class WebTalker {
 			byte[] b = new byte[avail];
 			in.read(b, 0, avail);
 			returnString = new String(b, "UTF-8");
+			Logger.log("Received " + returnString, Main.debugLevel-1);
 		}
 		return returnString;
 	}
