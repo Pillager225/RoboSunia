@@ -133,9 +133,9 @@ public class Main extends Thread {
 		b[3] = (char) rmPWM;
 		if(!ka.camCenterPressed) {
 			if(ka.camUpPressed) {
-				b[4] = '2';
-			} else if(ka.camDownPressed) {
 				b[4] = '0';
+			} else if(ka.camDownPressed) {
+				b[4] = '2';
 			} else {
 				b[4] = '1';
 			}
