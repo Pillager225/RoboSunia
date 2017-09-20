@@ -17,15 +17,18 @@ SocketServer sock(PORT);
 clock_t lasttime;
 char *sockData = new char[MAX_DATA_LENGTH], *serData = new char[MAX_DATA_LENGTH];
 bool go = true;
+int debugLevel = 1;
 
 void transmissionLoop() {
 	if (sock.available() >= 4) {
 		int sockDataLength = sock.readUntil(sockData, MAX_DATA_LENGTH, '\r');
-		/*		printf("Socket: %d | ", sockDataLength);
-		for (int i = 0; i < sockDataLength; i++) {
-		printf("%d ", sockData[i]);
+		if (debugLevel >= 2) {
+			printf("Socket: %d | ", sockDataLength);
+			for (int i = 0; i < sockDataLength; i++) {
+				printf("%d ", sockData[i]);
+			}
+			printf("\n"); 
 		}
-		printf("\n"); */
 		if (sockDataLength == COMM_PACKET_LENGTH) {
 			sockData[sockDataLength] = '\0';
 			if (strcmp(sockData, "quit") == 0) {
@@ -36,17 +39,21 @@ void transmissionLoop() {
 	}
 	if (ser.available() > SERIAL_RESPONSE_LENGTH) {
 		int serDataLength = ser.readUntil(serData, MAX_DATA_LENGTH, '\r');
-		//printf("Serial: %d | ", serDataLength);
-		//for (int i = 0; i < serDataLength; i++) {
-		//	printf("%c", serData[i]);
-		//}
-		//printf("\n");
+		if (debugLevel >= 2) {
+			printf("Serial: %d | ", serDataLength);
+			for (int i = 0; i < serDataLength; i++) {
+				printf("%c", serData[i]);
+			}
+			printf("\n");
+		}
 		sock.write(serData, serDataLength);
 	}
 }
 
-int main() {
-
+int main(int argc, char *argv[]) {
+	if (argc > 1) {
+		debugLevel = atoi(argv[1]);
+	}
 	while (!ser.isConnected() && !sock.isConnected());
 	ser.begin();
 	sock.begin();
