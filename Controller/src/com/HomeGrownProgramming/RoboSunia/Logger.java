@@ -37,7 +37,7 @@ public class Logger {
 		}
 	}
 	
-	private static void writeToFile(String s) {
+	private static void writeToFile(final String s) {
 		if(fileOpened = false) {
 			try {
 				setupFile();
@@ -46,11 +46,21 @@ public class Logger {
 			}
 			fileOpened = true;
 		}
-		LocalDateTime now = LocalDateTime.now();
-		try {
-			w.write(dtf.format(now)+"| " + s + "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new Thread() {
+			LocalDateTime now = LocalDateTime.now();
+			
+			private synchronized void writeToFile() {
+				try {
+					w.write(dtf.format(now)+"| " + s + "\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			@Override 
+			public void run() {
+				writeToFile();
+			}
+		}.start();
 	}
 }
