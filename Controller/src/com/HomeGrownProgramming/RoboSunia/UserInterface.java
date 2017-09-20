@@ -60,6 +60,8 @@ public class UserInterface extends JFrame {
 		mainPanel.add(distanceLabel);
 		mainPanel.add(getControlsLabels());
 		mainPanel.add(getRobotMovementControls());
+		mainPanel.add(getLabel("Center Camera"));
+		mainPanel.add(getCenterCameraButton());
 		return mainPanel;
 	}
 	
@@ -139,5 +141,13 @@ public class UserInterface extends JFrame {
 		controls.add(createControlButton("v"));
 		controls.add(createControlButton(">"));
 		return controls;
+	}
+	
+	private JPanel getCenterCameraButton() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(1,1));
+		panel.setFocusable(false);
+		panel.add(createControlButton("\"SPACE_BAR\""));
+		return panel;
 	}
 }
