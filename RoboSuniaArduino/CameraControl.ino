@@ -21,6 +21,9 @@ void moveCameraServos(char *servoCommands) {
       servoAngles[i] -= MOVING_SPEED;
       servoAngles[i] = servoAngles[i] >= angLowLimit[i] ? servoAngles[i] : angLowLimit[i];
       servos[i].write(servoAngles[i]);
+    } else if(servoCommands[i] == '3') {
+      servoAngles[i] = servoAngles[i];
+      servos[i].write(servoAngles[i]);
     }
   }
 }

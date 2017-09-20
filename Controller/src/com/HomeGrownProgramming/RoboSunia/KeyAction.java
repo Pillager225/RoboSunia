@@ -10,11 +10,11 @@ public class KeyAction implements KeyListener {
 	public static final int lmFKey = KeyEvent.VK_O, lmBKey = KeyEvent.VK_PERIOD;
 	public static final int rmFKey = KeyEvent.VK_P, rmBKey = KeyEvent.VK_SLASH;
 	public static final int FORWARD = KeyEvent.VK_UP, LEFT = KeyEvent.VK_LEFT, RIGHT = KeyEvent.VK_RIGHT, BACK = KeyEvent.VK_DOWN;
-	public static final int camUp = KeyEvent.VK_W, camDown = KeyEvent.VK_S, camLeft = KeyEvent.VK_A, camRight = KeyEvent.VK_D;
+	public static final int camUp = KeyEvent.VK_W, camDown = KeyEvent.VK_S, camLeft = KeyEvent.VK_A, camRight = KeyEvent.VK_D, camCenter = KeyEvent.VK_SPACE;
 	public static final int QUIT = KeyEvent.VK_ESCAPE;
 	public int lmState = 0, rmState = 0;
 	public boolean forwardPressed = false, backwardPressed = false, leftPressed = false, rightPressed = false;
-	public boolean camUpPressed = false, camDownPressed = false, camLeftPressed = false, camRightPressed = false;
+	public boolean camUpPressed = false, camDownPressed = false, camLeftPressed = false, camRightPressed = false, camCenterPressed = false;
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -66,6 +66,13 @@ public class KeyAction implements KeyListener {
 				camRightPressed = true;
 				camLeftPressed = false;
 				break;
+			case camCenter:
+				camCenterPressed = true;
+				camRightPressed = false;
+				camLeftPressed = false;
+				camUpPressed = false;
+				camDownPressed = false;
+				break;
 		}
 	}
 
@@ -116,6 +123,9 @@ public class KeyAction implements KeyListener {
 				break;
 			case camRight:
 				camRightPressed = false;
+				break;
+			case camCenter:
+				camCenterPressed = false;
 				break;
 		}
 	}

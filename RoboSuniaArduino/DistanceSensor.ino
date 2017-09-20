@@ -1,12 +1,10 @@
 DistanceSensor dSenses[NUM_SENSORS];
 int inputPins[] = {A5};
-int voltVals[NUM_VALUES] = {603, 452, 264, 188, 150, 127, 108, 96, 85, 77, 70}; // analogRead vals
-int dists[NUM_VALUES] = {2, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31}; // inches
 long lasttimeDist = 0;
 
 
 void setupDistanceSensor() {
-  dSenses[FRONT_SENSOR] = DistanceSensor(inputPins[FRONT_SENSOR], NUM_VALUES, &voltVals[0], &dists[0]);
+  dSenses[FRONT_SENSOR] = DistanceSensor(inputPins[FRONT_SENSOR]);
 }
 
 String padOutput(String o, int dLen) {
@@ -24,7 +22,7 @@ String padOutput(String o, int dLen) {
 void handleDistanceSensors() {
   if(millis()-lasttimeDist >= SENSOR_READING_PERIOD) {
     dSenses[FRONT_SENSOR].getDistanceReading();  
-    Serial.print(padOutput(dSenses[FRONT_SENSOR].interperateDistanceReadings(), MESSAGE_LENGTH));
+    Serial.print(padOutput(String(dSenses[FRONT_SENSOR].getDistanceReading()), MESSAGE_LENGTH));
     lasttimeDist = millis();
   } else if(lasttime > millis()) {
     // millis() overflowed because the arduino has been running for more than 50 days

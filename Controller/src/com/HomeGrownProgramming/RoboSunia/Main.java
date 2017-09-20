@@ -131,20 +131,25 @@ public class Main extends Thread {
 		}
 		b[2] = (char) lmPWM;
 		b[3] = (char) rmPWM;
-		
-		if(ka.camUpPressed) {
-			b[4] = '2';
-		} else if(ka.camDownPressed) {
-			b[4] = '0';
+		if(!ka.camCenterPressed) {
+			if(ka.camUpPressed) {
+				b[4] = '2';
+			} else if(ka.camDownPressed) {
+				b[4] = '0';
+			} else {
+				b[4] = '1';
+			}
+			if(ka.camRightPressed) {
+				b[5] = '2';
+			} else if(ka.camLeftPressed) {
+				b[5] = '0';
+			} else {
+				b[5] = '1';
+			}
 		} else {
-			b[4] = '1';
-		}
-		if(ka.camRightPressed) {
-			b[5] = '2';
-		} else if(ka.camLeftPressed) {
-			b[5] = '0';
-		} else {
-			b[5] = '1';
+			ka.camCenterPressed = false;
+			b[4] = '3';
+			b[5] = '3';
 		}
 		b[6] = 13;
 		return b;

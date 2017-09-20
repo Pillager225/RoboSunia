@@ -26,21 +26,16 @@ int DistanceSensor::findDistanceFromAnalogVal(const int &val) const {
 DistanceSensor::DistanceSensor() {
 	pin = 0;
 	sampleSize = 0;
-	numOfValues = 0;
-	voltVals = 0;
-	dists = 0;
-	readingIndex = 0;
+	numOfValues = NUM_VALUES;
 	numOfReadings = 0;
 	distanceReadings = 0;
 	valid = false;
 }
 
-DistanceSensor::DistanceSensor(const int &pin, const int &numOfValues, int *voltVals, int *dists, const int &numOfReadings, const int &sampleSize) {
+DistanceSensor::DistanceSensor(const int &pin, const int &numOfReadings, const int &sampleSize) {
 	this->pin = pin;
 	this->sampleSize = sampleSize;
-	this->numOfValues = numOfValues;
-	this->voltVals = voltVals;
-	this->dists = dists;
+	this->numOfValues = NUM_VALUES;
 	readingIndex = 0;
 	this->numOfReadings = numOfReadings;
 	distanceReadings = new int[numOfReadings];
