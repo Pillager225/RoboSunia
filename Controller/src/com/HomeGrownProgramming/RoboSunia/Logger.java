@@ -12,6 +12,7 @@ public class Logger {
 	private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	private static LocalDateTime now = LocalDateTime.now();
 	private static File logFile = new File("RoboSuniaController"+dtf.format(now)+".log");
+	@SuppressWarnings("unused")
 	private static boolean fileOpened = false;
 	
 	public static void setLogLocation(String logLocation) {
