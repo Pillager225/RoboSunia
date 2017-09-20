@@ -107,8 +107,8 @@ public class UserInterface extends JFrame {
 		JPanel labels = new JPanel();
 		labels.setLayout(new GridLayout(1, 2));
 		labels.setFocusable(false);
-		labels.add(getLabel("Movement control"));
 		labels.add(getLabel("Camera control"));
+		labels.add(getLabel("Movement control"));
 		return labels;
 	}
 	
