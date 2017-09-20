@@ -1,5 +1,5 @@
 int VERTICLE = 0, HORIZONTAL = 1;
-int servoPins[] = {9, 10}, servoAngles[] = {30, 90}, angLowLimit[] = {30, 10}, angHighLimit[] = {80, 170};
+int servoPins[] = {9, 10}, servoAngles[] = {30, 90}, angLowLimit[] = {45, 10}, angHighLimit[] = {80, 170};
 Servo servos[NUM_CAMERA_SERVOS];
 
 void setupCameraServos() {
