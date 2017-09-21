@@ -35,11 +35,14 @@ public class WebTalker {
 	public void send(char[] b) {
 		out.print(b);
 		out.flush();
-		System.out.print("Sending ");
-		for(int i = 0; i < b.length; i++) {
-			System.out.print((int)b[i] + " ");
+		if(Main.debugLevel-1 > 0) {
+			String sendLog = "Sending ";
+			for(int i = 0; i < b.length; i++) {
+				sendLog += Integer.toString((int)b[i]) + " ";
+			}
+			sendLog +='\n';
+			Logger.log(sendLog, Main.debugLevel-1);
 		}
-		System.out.print('\n');
 	}
 	
 	public void send(String b) {

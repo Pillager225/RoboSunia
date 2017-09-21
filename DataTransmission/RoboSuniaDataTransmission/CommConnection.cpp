@@ -31,7 +31,8 @@ void CommConnection::fillBuffer(char *buff, const int &bytesRead) {
 CommConnection::CommConnection() {
 	connected = false;
 	interruptRead = false;
-	buffer = new char[BUFFER_SIZE];
+	buffer = new char[BUFFER_SIZE+1];
+	memset(buffer, 0, BUFFER_SIZE+1);
 	readIndex = 0;
 	writeIndex = 0;	
 }
@@ -89,7 +90,7 @@ int CommConnection::readUntil(char *buff, const int &buffSize, const char &delim
 				memcpy_s(&buff[leftOff], buffSize-leftOff, &buffer[readIndex], i-readIndex);
 				readIndex = i+1;
 				return count;
-			} else if(i+1 == BUFFER_SIZE) {
+			} else if(i == BUFFER_SIZE) {
 				memcpy_s(&buff[leftOff], buffSize-leftOff, &buffer[readIndex], i-readIndex);
 				leftOff = i-readIndex;
 				readIndex = 0;

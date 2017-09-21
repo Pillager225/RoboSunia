@@ -18,11 +18,8 @@ public class Main extends Thread {
 	public static final String portRegex = "[0-9]+";
 	public static final String connectionRegex = ipRegex+":"+portRegex;
 	public static int debugLevel = 1;
-	
 	public static int limitPWM = 100;
-	private int lmPWM = 0, rmPWM = 0;
-	private int PWMInc = 30;
-
+	
 	private static WebTalker wt = null;
 	private KeyAction ka;
 	private static boolean go = true; 
@@ -62,12 +59,13 @@ public class Main extends Thread {
 		wt = new WebTalker(hostName, portNumber);
 	}
 	
-	public static void terminate() throws IOException {
+	public static void terminate() throws IOException, InterruptedException {
 		// send terminating signal
 		if(wt != null && wt.connected) {
 			wt.send("quit");
 			wt.close();
 		}
+		Logger.endLogger();
 		go = false;
 	}
 	
@@ -81,85 +79,11 @@ public class Main extends Thread {
 		return s.substring(0, i+1);
 	}
 	
-	private void motorLogic() {
-		if(ka.forwardPressed) {
-			if(ka.leftPressed) {
-				ka.lmState = 0;
-				ka.rmState = 1;
-			} else if(ka.rightPressed) {
-				ka.lmState = 1;
-				ka.rmState = 0;
-			} else {
-				ka.lmState = 1;
-				ka.rmState = 1;
-			}
-		} else if(ka.backwardPressed) {
-			if(ka.leftPressed) {
-				ka.lmState = -1;
-				ka.rmState = 0;
-			} else if(ka.rightPressed) {
-				ka.lmState = 0;
-				ka.rmState = -1;
-			} else {
-				ka.lmState = -1;
-				ka.rmState = -1;
-			}
-		} else if(ka.leftPressed) {
-			ka.lmState = -1;
-			ka.rmState = 1;
-		} else if(ka.rightPressed) {
-			ka.lmState = 1;
-			ka.rmState = -1;
-		}
-	}
-	
-	// This will turn the boolean values about the motor states stored in ka into a string.
-	private char[] getControlPacket() {
-		motorLogic();
-		char[] b = new char[7];
-		b[0] = (char) (ka.lmState == -1 ? 1 : 0);
-		b[1] = (char) (ka.rmState == -1 ? 1 : 0);
-		if(ka.lmState != 0) {
-			lmPWM = lmPWM+PWMInc > limitPWM ? limitPWM : lmPWM+PWMInc;
-		} else {
-			lmPWM = lmPWM-PWMInc < 0 ? 0 : lmPWM-PWMInc;
-		}
-		if(ka.rmState != 0) {
-			rmPWM = rmPWM+PWMInc >= limitPWM ? limitPWM : rmPWM+PWMInc;
-		} else {
-			rmPWM = rmPWM-PWMInc < 0 ? 0 : rmPWM-PWMInc;
-		}
-		b[2] = (char) lmPWM;
-		b[3] = (char) rmPWM;
-		if(!ka.camCenterPressed) {
-			if(ka.camUpPressed) {
-				b[4] = '0';
-			} else if(ka.camDownPressed) {
-				b[4] = '2';
-			} else {
-				b[4] = '1';
-			}
-			if(ka.camRightPressed) {
-				b[5] = '2';
-			} else if(ka.camLeftPressed) {
-				b[5] = '0';
-			} else {
-				b[5] = '1';
-			}
-		} else {
-			ka.camCenterPressed = false;
-			b[4] = '3';
-			b[5] = '3';
-		}
-		b[6] = 13;
-		return b;
-	}
-	
 	@Override
 	public void run() {
 		while(go) {
 			try {
-				wt.send(getControlPacket());
+				wt.send(ka.getControlPacket());
 				String input = wt.read();
 				if(input.length() > 0) {
 					input = removePadding(input);
@@ -245,6 +169,7 @@ public class Main extends Thread {
 	
 	public static void main(String[] args) {
 		checkArguments(args);
+		Logger.logFilePrefix = "RoboSuniaController";
 		Logger.log("Connecting to " + hostName + ":" + Integer.toString(portNumber), debugLevel);
 		new Main(hostName, portNumber).start();
 	}
