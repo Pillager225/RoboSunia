@@ -1,5 +1,5 @@
 // RoboSuniaDataTransmission.cpp : Defines the entry point for the console application.
-#include "SocketServer.h"
+#include "TCPServer.h"
 #include "SerialPort.h"
 #include <cstdio>
 #include <iostream>
@@ -13,7 +13,7 @@
 #define SERIAL_RESPONSE_LENGTH 16
 
 SerialPort ser;
-SocketServer sock(PORT);
+TCPServer sock(PORT);
 clock_t lasttime;
 char *sockData = new char[MAX_DATA_LENGTH], *serData = new char[MAX_DATA_LENGTH];
 bool go = true;

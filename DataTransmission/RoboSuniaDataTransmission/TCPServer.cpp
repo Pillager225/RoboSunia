@@ -1,7 +1,7 @@
-#include "SocketServer.h"
+#include "TCPServer.h"
 
 // protected
-bool SocketServer::setupSocketServer(const char *port) {
+bool TCPServer::setupTCPServer(const char *port) {
 	WSADATA wsaData;
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
 	ZeroMemory(&hints, sizeof (hints));
@@ -52,7 +52,7 @@ bool SocketServer::setupSocketServer(const char *port) {
 	return waitForClientConnection();
 }
 
-bool SocketServer::waitForClientConnection() {
+bool TCPServer::waitForClientConnection() {
 	// setup listening on socket for connections
     if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
 	    printf( "Listen failed with error: %ld\n", WSAGetLastError() );
@@ -75,7 +75,7 @@ bool SocketServer::waitForClientConnection() {
 	}
 }
 
-void SocketServer::exitGracefully() {
+void TCPServer::exitGracefully() {
 	// shutdown the send half of the connection since no more data will be sent
 	int iResult = shutdown(clientSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
@@ -87,31 +87,31 @@ void SocketServer::exitGracefully() {
 	WSACleanup();
 }
 
-int SocketServer::getData(char *buff, const int &buffSize) {
+int TCPServer::getData(char *buff, const int &buffSize) {
 	if(connected)
 		return recv(clientSocket, buff, buffSize, 0);
 	return -1;
 }
 
-void SocketServer::failedRead() {
+void TCPServer::failedRead() {
 	closesocket(clientSocket);
     connected = false;
 	waitForClientConnection();
 }
 
 // public 
-SocketServer::SocketServer(const char *port) : CommConnection() {
-	if(!setupSocketServer(port)) {
+TCPServer::TCPServer(const char *port) : CommConnection() {
+	if(!setupTCPServer(port)) {
 		printf("Could not setup socket server. Check parameters.\n");
 	}
 }
 
-SocketServer::~SocketServer() {
+TCPServer::~TCPServer() {
 	CommConnection::~CommConnection();
 	exitGracefully();
 }
 
-bool SocketServer::write(char *buff, const int &buffSize) {
+bool TCPServer::write(char *buff, const int &buffSize) {
 	if(!connected) 
 		return false;
 	int iSendResult = send(clientSocket, buff, buffSize, 0);
@@ -122,7 +122,7 @@ bool SocketServer::write(char *buff, const int &buffSize) {
 	return true;
 }
 
-// void SocketServer::echo() {
+// void TCPServer::echo() {
 // 	int iResult, iSendResult;
 // 	char recvbuf[MAX_DATA_LENGTH];
 // 	// Receive until the peer shuts down the connection

@@ -19,19 +19,19 @@
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-class SocketServer : public CommConnection {
+class TCPServer : public CommConnection {
 protected:
 	SOCKET listenSocket, clientSocket;
 
-	bool setupSocketServer(const char *port);
+	bool setupTCPServer(const char *port);
 	bool waitForClientConnection();
 	void exitGracefully();
 
 	void failedRead();
 	int getData(char *buff, const int &buffSize);
 public:
-	SocketServer(const char *port);
-	~SocketServer();
+	TCPServer(const char *port);
+	~TCPServer();
 	
 	bool write(char *buff, const int &buffSize);
 };
