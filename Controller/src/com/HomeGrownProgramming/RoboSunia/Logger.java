@@ -8,21 +8,23 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Logger {
+	public static String logFilePrefix = "java_logger";
 	private static BufferedWriter w;
-	private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+	private static DateTimeFormatter loggerFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"), fileNameFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 	private static LocalDateTime now = LocalDateTime.now();
-	private static File logFile = new File("RoboSuniaController"+dtf.format(now)+".log");
-	@SuppressWarnings("unused")
+	private static File logFile = new File(logFilePrefix+fileNameFormat.format(now)+".log");
 	private static boolean fileOpened = false;
+	private static LinkedList<Thread> threads = new LinkedList<Thread>();
 	
 	public static void setLogLocation(String logLocation) {
 		logFile = new File(logLocation);
 	}
 	
 	private static void setupFile() throws IOException {
-		
 		if(!logFile.exists()) {
 			logFile.createNewFile();
 		}
@@ -46,7 +48,7 @@ public class Logger {
 	}
 	
 	private static void writeToFile(final String s) {
-		if(fileOpened = false) {
+		if(!fileOpened) {
 			try {
 				setupFile();
 			} catch (IOException e) {
@@ -54,12 +56,13 @@ public class Logger {
 			}
 			fileOpened = true;
 		}
-		new Thread() {
+		Thread t = new Thread() {
 			LocalDateTime now = LocalDateTime.now();
 			
 			private synchronized void writeToFile() {
 				try {
-					w.write(dtf.format(now)+"| " + s + "\n");
+					w.write(loggerFormat.format(now)+"| " + s + "\n");
+					w.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -69,8 +72,20 @@ public class Logger {
 			public void run() {
 				writeToFile();
 			}
-		}.start();
+		};
+		threads.add(t);
+		t.start();
 	}
 	
-	
+	public static void endLogger() throws IOException, InterruptedException {
+		Iterator<Thread> threadIter = threads.iterator();
+		while(threadIter.hasNext()) {
+			Thread t = threadIter.next();
+			if(t.isAlive()) {
+				t.interrupt();
+				t.join(500);
+			}
+		}
+		w.close();
+	}
 }

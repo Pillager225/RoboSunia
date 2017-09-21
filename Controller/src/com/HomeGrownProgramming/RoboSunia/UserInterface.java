@@ -20,15 +20,15 @@ import javax.swing.event.ChangeListener;
 public class UserInterface extends JFrame {
 
 	private static final long serialVersionUID = 6335319339658237340L;
-	public JLabel distanceLabel;
 	private static final int numInvisibleButtons = 6;
+	public JLabel distanceLabel;
 	
 	protected class WindowListener extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			try {
 				Logger.log("Exit button was pressed. Exiting.", Main.debugLevel);
 				Main.terminate();
-			} catch (IOException e1) {
+			} catch (IOException | InterruptedException e1) {
 				Logger.log(e1, Main.debugLevel);
 			}
 		}
