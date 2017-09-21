@@ -107,7 +107,6 @@ TCPServer::TCPServer(const char *port) : CommConnection() {
 }
 
 TCPServer::~TCPServer() {
-	CommConnection::~CommConnection();
 	exitGracefully();
 }
 
