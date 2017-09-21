@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SOCKETSERVER_H
-#define SOCKETSERVER_H
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
 #undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN
